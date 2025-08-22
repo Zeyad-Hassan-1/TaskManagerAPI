@@ -3,13 +3,13 @@ class PasswordResetsController < ApplicationController
   skip_before_action :authorized
 
   # Request reset (step 1)
-# New version using username
+  # New version using username
   def create
     user = User.find_by(email: params[:email])
     if user
       user.generate_password_reset_token!
       # Send token via your preferred method (API response, SMS, etc.)
-      render json: { 
+      render json: {
         message: "Reset instructions sent",
         token: user.reset_token # In production, send this via email/SMS instead
       }

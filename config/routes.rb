@@ -1,13 +1,13 @@
 Rails.application.routes.draw do
-  # config/routes.rb
-    post '/login', to: 'auth#login'
-    post '/refresh', to: 'auth#refresh'
-    post '/logout', to: 'auth#logout'
-    post '/signup', to: 'users#create'
-    get '/me', to: 'users#me'
-    resources :password_resets, only: [:create] do
+    # config/routes.rb
+    post "/login", to: "auth#login"
+    post "/refresh", to: "auth#refresh"
+    post "/logout", to: "auth#logout"
+    post "/signup", to: "users#create"
+    get "/me", to: "users#me"
+    resources :password_resets, only: [ :create ] do
       collection do
-        put '/', to: 'password_resets#update'  # PUT /password_resets
+        put "/", to: "password_resets#update"  # PUT /password_resets
       end
     end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

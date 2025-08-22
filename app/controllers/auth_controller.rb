@@ -1,7 +1,7 @@
 require "digest"
 
 class AuthController < ApplicationController
-  skip_before_action :authorized, only: [:login, :refresh, :logout]
+  skip_before_action :authorized, only: [ :login, :refresh, :logout ]
   rescue_from ActiveRecord::RecordNotFound, with: :handle_record_not_found
 
   def login
@@ -61,7 +61,7 @@ end
   end
 
 
-  private 
+  private
 
     def set_refresh_cookie(raw_token, expires_at)
     cookies.encrypted[:refresh_token] = {
@@ -73,12 +73,11 @@ end
     }
   end
 
-  def login_params 
+  def login_params
     params.permit(:username, :password)
   end
 
   def handle_record_not_found(e)
     render json: { message: "User doesn't exist" }, status: :unauthorized
   end
-
 end
