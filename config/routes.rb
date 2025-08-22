@@ -1,16 +1,58 @@
 Rails.application.routes.draw do
-    # config/routes.rb
-    post "/login", to: "auth#login"
-    post "/refresh", to: "auth#refresh"
-    post "/logout", to: "auth#logout"
-    post "/signup", to: "users#create"
-    get "/me", to: "users#me"
-    resources :password_resets, only: [ :create ] do
-      collection do
-        put "/", to: "password_resets#update"  # PUT /password_resets
+  # API Versioning
+  namespace :api do
+    namespace :v1 do
+      # Authentication routes
+      post "/login", to: "auth#login"
+      post "/refresh", to: "auth#refresh"
+      post "/logout", to: "auth#logout"
+      post "/signup", to: "users#create"
+      get "/me", to: "users#me"
+
+      # Password resets
+      resources :password_resets, only: [ :create ] do
+        collection do
+          put "/", to: "password_resets#update"  # PUT /api/v1/password_resets
+        end
       end
+
+      # Teams
+      resources :teams do
+        # Nested projects under teams
+        resources :projects, only: [ :index, :create ]
+      end
+
+      # Projects (can also be accessed directly)
+      resources :projects, except: [ :index, :create ] do
+        # Nested tasks under projects
+        resources :tasks, only: [ :index, :create ]
+      end
+
+      # Tasks (can also be accessed directly)
+      resources :tasks, except: [ :index, :create ]
+
+      # Team memberships
+      resources :team_memberships, only: [ :index, :create, :destroy ]
+
+      # Project memberships
+      resources :project_memberships, only: [ :index, :create, :destroy ]
+
+      # Task memberships
+      resources :task_memberships, only: [ :index, :create, :destroy ]
     end
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  end
+
+  # Legacy routes (for backward compatibility - you can remove these later)
+  # post "/login", to: "auth#login"
+  # post "/refresh", to: "auth#refresh"
+  # post "/logout", to: "auth#logout"
+  # post "/signup", to: "users#create"
+  # get "/me", to: "users#me"
+  # resources :password_resets, only: [ :create ] do
+  #   collection do
+  #     put "/", to: "password_resets#update"
+  #   end
+  # end
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
