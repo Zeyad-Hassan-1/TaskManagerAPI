@@ -10,9 +10,28 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_22_160817) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_22_161555) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "project_memberships", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "project_id", null: false
+    t.integer "role", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["project_id"], name: "index_project_memberships_on_project_id"
+    t.index ["user_id"], name: "index_project_memberships_on_user_id"
+  end
+
+  create_table "projects", force: :cascade do |t|
+    t.text "name", null: false
+    t.text "discription", null: false
+    t.bigint "team_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["team_id"], name: "index_projects_on_team_id"
+  end
 
   create_table "refresh_tokens", force: :cascade do |t|
     t.bigint "user_id", null: false
@@ -23,6 +42,40 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_22_160817) do
     t.datetime "updated_at", null: false
     t.index ["token_digest"], name: "index_refresh_tokens_on_token_digest", unique: true
     t.index ["user_id"], name: "index_refresh_tokens_on_user_id"
+  end
+
+  create_table "task_memberships", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "task_id", null: false
+    t.integer "role", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["task_id"], name: "index_task_memberships_on_task_id"
+    t.index ["user_id"], name: "index_task_memberships_on_user_id"
+  end
+
+  create_table "tasks", force: :cascade do |t|
+    t.bigint "project_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["project_id"], name: "index_tasks_on_project_id"
+  end
+
+  create_table "team_memberships", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "team_id", null: false
+    t.integer "role", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["team_id"], name: "index_team_memberships_on_team_id"
+    t.index ["user_id"], name: "index_team_memberships_on_user_id"
+  end
+
+  create_table "teams", force: :cascade do |t|
+    t.text "name", null: false
+    t.text "discription", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "users", force: :cascade do |t|
@@ -40,5 +93,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_22_160817) do
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 
+  add_foreign_key "project_memberships", "projects"
+  add_foreign_key "project_memberships", "users"
+  add_foreign_key "projects", "teams"
   add_foreign_key "refresh_tokens", "users"
+  add_foreign_key "task_memberships", "tasks"
+  add_foreign_key "task_memberships", "users"
+  add_foreign_key "tasks", "projects"
+  add_foreign_key "team_memberships", "teams"
+  add_foreign_key "team_memberships", "users"
 end

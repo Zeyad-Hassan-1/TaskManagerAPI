@@ -3,6 +3,12 @@ require "digest"
 class User < ApplicationRecord
     has_secure_password
     has_many :refresh_tokens, dependent: :destroy
+    has_many :team_memberships, dependent: :destroy
+    has_many :teams, through: :team_memberships
+    has_many :project_memberships, dependent: :destroy
+    has_many :projects, through: :project_memberships
+    has_many :task_memberships, dependent: :destroy
+    has_many :tasks, through: :task_memberships
     validates :username, uniqueness: true
 
     # returns the RAW token (client uses this), stores only SHA256 digest
