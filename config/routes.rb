@@ -20,16 +20,38 @@ Rails.application.routes.draw do
       resources :teams do
         # Nested projects under teams
         resources :projects, only: [ :index, :create ]
+
+        # Team member management
+        member do
+          post :invite_member
+          delete "members/:user_id", to: "teams#remove_member", as: :remove_member
+          put "members/:user_id/promote", to: "teams#promote_member", as: :promote_member
+          put "members/:user_id/demote", to: "teams#demote_member", as: :demote_member
+        end
       end
 
       # Projects (can also be accessed directly)
       resources :projects, except: [ :index, :create ] do
         # Nested tasks under projects
         resources :tasks, only: [ :index, :create ]
+
+        # Project member management
+        member do
+          post :invite_member
+          delete "members/:user_id", to: "projects#remove_member", as: :remove_member
+          put "members/:user_id/promote", to: "projects#promote_member", as: :promote_member
+          put "members/:user_id/demote", to: "projects#demote_member", as: :demote_member
+        end
       end
 
       # Tasks (can also be accessed directly)
-      resources :tasks, except: [ :index, :create ]
+      resources :tasks, except: [ :index, :create ] do
+        # Task member management
+        member do
+          post :assign_member
+          delete "members/:user_id", to: "tasks#remove_member", as: :remove_member
+        end
+      end
 
       # Team memberships
       resources :team_memberships, only: [ :index, :create, :destroy ]
