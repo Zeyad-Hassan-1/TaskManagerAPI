@@ -72,6 +72,10 @@ module Api
           return render_error("User must be a member of the project to be assigned to tasks")
         end
 
+        if @task.task_memberships.exists?(user: user)
+          return render_error("User is already a member of this task")
+        end
+
         role = params[:role] || "assignee"
         unless [ "assignee", "reviewer", "watcher" ].include?(role)
           return render_error("Invalid role. Must be 'assignee', 'reviewer', or 'watcher'")
