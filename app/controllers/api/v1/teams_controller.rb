@@ -138,7 +138,7 @@ module Api
       private
 
       def set_team
-        @team = current_user.teams.find(params[:id])
+        @team = current_user.teams.includes(:users, :team_memberships).find(params[:id])
       rescue ActiveRecord::RecordNotFound
         render_error("Team not found", :not_found)
       end
@@ -162,7 +162,7 @@ module Api
       end
 
       def team_params
-        params.require(:team).permit(:name, :discription)
+        params.permit(:name, :discription)
       end
     end
   end
