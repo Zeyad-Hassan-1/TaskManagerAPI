@@ -29,19 +29,13 @@ module Api
           return render_unauthorized("You must be an admin or owner of the team to create projects")
         end
 
-        @project = @team.projects.build(project_params)
-
-        if @project.save
-          # Create project membership for the creator
-          ProjectMembership.create!(
-            user: current_user,
-            project: @project,
-            role: :owner
-          )
-          render_success(@project, :created)
-        else
-          render_error(@project.errors.full_messages.join(", "))
+        ActiveRecord::Base.transaction do
+          @project = @team.projects.create!(project_params)
+          @project.project_memberships.create!(user: current_user, role: :owner)
         end
+        render_success(@project, :created)
+      rescue ActiveRecord::RecordInvalid => e
+        render_error(e.message)
       end
 
       # PUT /api/v1/projects/:id

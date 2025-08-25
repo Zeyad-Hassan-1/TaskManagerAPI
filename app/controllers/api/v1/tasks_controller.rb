@@ -29,19 +29,13 @@ module Api
           return render_unauthorized("You must be an admin or owner of the project to create tasks")
         end
 
-        @task = @project.tasks.build(task_params)
-
-        if @task.save
-          # Create task membership for the creator
-          TaskMembership.create!(
-            user: current_user,
-            task: @task,
-            role: :assignee
-          )
-          render_success(@task, :created)
-        else
-          render_error(@task.errors.full_messages.join(", "))
+        ActiveRecord::Base.transaction do
+          @task = @project.tasks.create!(task_params)
+          @task.task_memberships.create!(user: current_user, role: :assignee)
         end
+        render_success(@task, :created)
+      rescue ActiveRecord::RecordInvalid => e
+        render_error(e.message)
       end
 
       # PUT /api/v1/tasks/:id

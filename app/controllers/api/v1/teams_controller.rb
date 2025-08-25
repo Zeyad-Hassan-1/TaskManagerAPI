@@ -21,19 +21,13 @@ module Api
 
       # POST /api/v1/teams
       def create
-        @team = Team.new(team_params)
-
-        if @team.save
-          # Create team membership for the creator
-          TeamMembership.create!(
-            user: current_user,
-            team: @team,
-            role: :owner
-          )
-          render_success(@team, :created)
-        else
-          render_error(@team.errors.full_messages.join(", "))
+        ActiveRecord::Base.transaction do
+          @team = Team.create!(team_params)
+          @team.team_memberships.create!(user: current_user, role: :owner)
         end
+          render_success(@team, :created)
+      rescue ActiveRecord::RecordInvalid => e
+        render_error(e.message)
       end
 
       # PUT /api/v1/teams/:id
