@@ -126,9 +126,7 @@ module Api
       end
 
       def task_params
-        # For now, tasks only have project_id which is set automatically
-        # You can add more fields here as you expand the task model
-        {}
+        params.permit(:name, :description, :priority, :due_date)
       end
     end
   end

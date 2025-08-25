@@ -5,5 +5,5 @@ class Project < ApplicationRecord
   has_many :users, through: :project_memberships
 
   validates :name, presence: true
-  validates :discription, presence: true
+  validates :description, presence: true
 end
