@@ -46,10 +46,18 @@ Rails.application.routes.draw do
 
       # Tasks (can also be accessed directly)
       resources :tasks, except: [ :index, :create ] do
+        resources :sub_tasks, only: [ :index, :create ]
         # Task member management
         member do
           post :assign_member
           delete "members/:user_id", to: "tasks#remove_member", as: :remove_member
+        end
+      end
+
+      resources :sub_tasks, only: [ :show, :update, :destroy ] do
+        member do
+          post :assign_member
+          delete "members/:user_id", to: "sub_tasks#remove_member", as: :remove_member
         end
       end
 
