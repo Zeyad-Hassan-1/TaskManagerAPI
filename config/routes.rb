@@ -36,6 +36,7 @@ Rails.application.routes.draw do
         resources :tasks, only: [ :index, :create ]
         resources :tags, only: [ :create, :destroy ], controller: "project_tags"
         resources :comments, only: [ :create, :update, :destroy ], controller: "project_comments"
+        resources :attachments, only: [ :create, :destroy ], controller: "project_attachments"
 
         # Project member management
         member do
@@ -51,6 +52,7 @@ Rails.application.routes.draw do
         resources :sub_tasks, only: [ :index, :create ]
         resources :tags, only: [ :create, :destroy ], controller: "task_tags"
         resources :comments, only: [ :create, :update, :destroy ], controller: "task_comments"
+        resources :attachments, only: [ :create, :destroy ], controller: "task_attachments"
         # Task member management
         member do
           post :assign_member
