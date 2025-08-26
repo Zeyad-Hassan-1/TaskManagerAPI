@@ -25,7 +25,16 @@ module Taggable
 
   def ensure_member_access
     project = @taggable.is_a?(Project) ? @taggable : @taggable.project
-    unless member_of_project?(project)
+
+    # For tasks, check both project membership and task membership
+    if @taggable.is_a?(Task)
+      task_membership = @taggable.task_memberships.find_by(user: current_user)
+      has_access = member_of_project?(project) || task_membership.present?
+    else
+      has_access = member_of_project?(project)
+    end
+
+    unless has_access
       render_unauthorized("You do not have permission to manage tags for this resource")
     end
   end
