@@ -1,4 +1,4 @@
-class Api::V1::ProjectCommentsController < ApplicationController
+class Api::V1::ProjectCommentsController < Api::ApplicationController
   include Authorizable
   include Commentable
 

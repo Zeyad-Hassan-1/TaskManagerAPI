@@ -1,4 +1,4 @@
-class Api::V1::TaskCommentsController < ApplicationController
+class Api::V1::TaskCommentsController < Api::ApplicationController
   include Authorizable
   include Commentable
 

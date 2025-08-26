@@ -1,4 +1,4 @@
-class Api::V1::ProjectTagsController < ApplicationController
+class Api::V1::ProjectTagsController < Api::ApplicationController
   include Authorizable
   include Taggable
 

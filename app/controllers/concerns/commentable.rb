@@ -3,7 +3,7 @@ extend ActiveSupport::Concern
 
   included do
     before_action :set_commentable
-    before_action :ensure_project_member
+    before_action :ensure_member_access
   end
 
   def create
@@ -46,6 +46,14 @@ extend ActiveSupport::Concern
   end
 
   private
+
+  def ensure_member_access
+    project = @commentable.is_a?(Project) ? @commentable : @commentable.project
+    unless member_of_project?(project)
+      render_unauthorized("You do not have permission to manage comments for this resource")
+    end
+  end
+
   def comment_params
     params.permit(:content)
   end

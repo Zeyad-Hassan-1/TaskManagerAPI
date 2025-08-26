@@ -3,7 +3,7 @@ module Taggable
 
   included do
     before_action :set_taggable
-    before_action :ensure_project_member
+    before_action :ensure_member_access
   end
 
   def create
@@ -22,6 +22,14 @@ module Taggable
     render_success({ message: "Tag removed successfully" })
   end
   private
+
+  def ensure_member_access
+    project = @taggable.is_a?(Project) ? @taggable : @taggable.project
+    unless member_of_project?(project)
+      render_unauthorized("You do not have permission to manage tags for this resource")
+    end
+  end
+
   def tag_params
     params.permit(:name)
   end
