@@ -2,7 +2,8 @@ class Task < ApplicationRecord
   belongs_to :project
   has_many :task_memberships, dependent: :destroy
   has_many :users, through: :task_memberships
-  has_many :tags, as: :taggable
+  has_many :taggings, as: :taggable
+  has_many :tags, through: :taggings
   has_many :comments, as: :commentable
   has_many :attachments, as: :attachable
 

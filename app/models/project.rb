@@ -3,7 +3,8 @@ class Project < ApplicationRecord
   has_many :tasks, dependent: :destroy
   has_many :project_memberships, dependent: :destroy
   has_many :users, through: :project_memberships
-  has_many :tags, as: :taggable
+  has_many :taggings, as: :taggable
+  has_many :tags, through: :taggings
   has_many :comments, as: :commentable
   has_many :attachments, as: :attachable
 
