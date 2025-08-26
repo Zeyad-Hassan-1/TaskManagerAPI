@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_26_151723) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_26_192651) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -48,7 +48,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_26_151723) do
     t.bigint "attachable_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.string "name"
     t.index ["attachable_type", "attachable_id"], name: "index_attachments_on_attachable"
+    t.index ["user_id"], name: "index_attachments_on_user_id"
   end
 
   create_table "comments", force: :cascade do |t|
@@ -166,6 +169,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_26_151723) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "attachments", "users"
   add_foreign_key "comments", "users"
   add_foreign_key "project_memberships", "projects"
   add_foreign_key "project_memberships", "users"

@@ -7,10 +7,8 @@ module Attachable
   end
 
   def create
-    # We need to decide if an attachment should belong to a user.
-    # If so, we need a migration to add `user_id` to `attachments`.
-    # For now, we'll proceed without it.
     attachment = @attachable.attachments.new(attachment_params)
+    attachment.user = current_user
 
     if attachment.save
       render_success(attachment_json(attachment), :created)
@@ -24,6 +22,10 @@ module Attachable
 
     # We'll need authorization here, probably based on project ownership
     # or who uploaded the file.
+    unless attachment.user == current_user || member_of_project?(@attachable.project)
+      render_unauthorized("You do not have permission to delete this attachment")
+      return
+    end
 
     attachment.destroy
     render_success({ message: "Attachment removed successfully" })
@@ -33,7 +35,7 @@ module Attachable
 
   def attachment_params
     # Permit :file for uploads, :link for URLs, and a :name for the attachment.
-    params.permit(:file, :link)
+    params.permit(:file, :link, :name)
   end
 
   def ensure_member_access
@@ -45,7 +47,7 @@ module Attachable
 
   def attachment_json(attachment)
     # Base JSON includes the attributes from our model
-    base_json = attachment.as_json(only: [ :id, :link, :created_at ])
+    base_json = attachment.as_json(only: [ :id, :name, :link, :created_at, :user_id ])
 
     # If a file is attached, add its URL and metadata to the JSON
     if attachment.file.attached?
