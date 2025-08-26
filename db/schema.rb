@@ -10,9 +10,27 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_25_182325) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_26_124345) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "attachments", force: :cascade do |t|
+    t.text "link"
+    t.string "attachable_type"
+    t.bigint "attachable_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["attachable_type", "attachable_id"], name: "index_attachments_on_attachable"
+  end
+
+  create_table "comments", force: :cascade do |t|
+    t.text "content"
+    t.string "commentable_type"
+    t.bigint "commentable_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["commentable_type", "commentable_id"], name: "index_comments_on_commentable"
+  end
 
   create_table "project_memberships", force: :cascade do |t|
     t.bigint "user_id", null: false
@@ -42,6 +60,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_25_182325) do
     t.datetime "updated_at", null: false
     t.index ["token_digest"], name: "index_refresh_tokens_on_token_digest", unique: true
     t.index ["user_id"], name: "index_refresh_tokens_on_user_id"
+  end
+
+  create_table "tags", force: :cascade do |t|
+    t.text "name"
+    t.string "taggable_type"
+    t.bigint "taggable_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["taggable_type", "taggable_id"], name: "index_tags_on_taggable"
   end
 
   create_table "task_memberships", force: :cascade do |t|
