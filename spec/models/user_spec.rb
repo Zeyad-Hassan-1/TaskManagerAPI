@@ -31,9 +31,10 @@ RSpec.describe User, type: :model do
       expect(user).to be_valid
     end
 
-    it 'accepts nil email' do
+    it 'requires email' do
       user = build(:user, email: nil)
-      expect(user).to be_valid
+      expect(user).not_to be_valid
+      expect(user.errors[:email]).to include("can't be blank")
     end
   end
 

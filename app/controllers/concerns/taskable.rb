@@ -69,19 +69,19 @@ module Taskable
 
   def ensure_member_access
     unless member_of_project?(@task.project)
-      render_unauthorized("You must be a member of this project to view tasks")
+      render_forbidden("You must be a member of this project to view tasks")
     end
   end
 
   def ensure_admin_access
     unless admin_of_project?(@task.project)
-      render_unauthorized("You must be an admin or owner of this project to perform this action")
+      render_forbidden("You must be an admin or owner of this project to perform this action")
     end
   end
 
   def ensure_owner_access
     unless owner_of_project?(@task.project)
-      render_unauthorized("You must be the owner of this project to delete tasks")
+      render_forbidden("You must be the owner of this project to delete tasks")
     end
   end
 

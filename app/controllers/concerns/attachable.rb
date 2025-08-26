@@ -20,9 +20,9 @@ module Attachable
   def destroy
     attachment = @attachable.attachments.find(params[:id])
 
-    # We'll need authorization here, probably based on project ownership
-    # or who uploaded the file.
-    unless attachment.user == current_user || member_of_project?(@attachable.project)
+    # Check if user can delete this attachment (owner or project member)
+    project = @attachable.is_a?(Project) ? @attachable : @attachable.project
+    unless attachment.user == current_user || member_of_project?(project)
       render_unauthorized("You do not have permission to delete this attachment")
       return
     end

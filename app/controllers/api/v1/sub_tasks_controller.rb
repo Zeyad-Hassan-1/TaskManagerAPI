@@ -19,7 +19,7 @@ module Api
       # POST /api/v1/tasks/:task_id/sub_tasks
       def create
         unless can_manage_tasks_in_project?(@parent_task.project)
-          return render_unauthorized("You must be an admin or owner of the project to create tasks")
+          return render_forbidden("You must be an admin or owner of the project to create tasks")
         end
 
         ActiveRecord::Base.transaction do
@@ -29,6 +29,9 @@ module Api
         render_success(@task, :created)
       rescue ActiveRecord::RecordInvalid => e
         render_error(e.message)
+      rescue ArgumentError => e
+        # Handle enum validation errors (e.g., invalid priority)
+        render_error("Priority is not included in the list")
       end
 
       private
@@ -44,7 +47,7 @@ module Api
         @task = Task.find(params[:id])
         @parent_task = @task.parent
         # Ensure the user has access through the project membership
-        unless current_user.tasks.exists?(id: @task.id)
+        unless member_of_project?(@task.project)
           raise ActiveRecord::RecordNotFound
         end
       rescue ActiveRecord::RecordNotFound

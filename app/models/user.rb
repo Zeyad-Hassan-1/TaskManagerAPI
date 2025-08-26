@@ -12,6 +12,9 @@ class User < ApplicationRecord
     has_many :comments, dependent: :destroy
     has_many :attachments, dependent: :destroy
     validates :username, presence: true, uniqueness: true
+    validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
+    validates :password, presence: true, length: { minimum: 6 }, on: :create
+    validates :password, length: { minimum: 6 }, allow_blank: false, if: :password_digest_changed?
 
     # returns the RAW token (client uses this), stores only SHA256 digest
     def generate_refresh_token
@@ -33,9 +36,16 @@ class User < ApplicationRecord
         self.reset_token = SecureRandom.urlsafe_base64
         self.reset_sent_at = Time.now.utc
         save!(validate: false) # Skip validations for password reset
+        reset_token
     end
 
     def password_reset_expired?
         reset_sent_at < 1.hour.ago
+    end
+
+    private
+
+    def password_required?
+        password.present? || password_confirmation.present?
     end
 end

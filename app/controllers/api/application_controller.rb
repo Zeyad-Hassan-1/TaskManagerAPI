@@ -7,12 +7,18 @@ module Api
       render json: { data: data }, status: status
     end
 
-    def render_error(message, status = :unprocessable_entity)
-      render json: { error: message }, status: status
-    end
+    private
+
+  def render_error(message, status = :unprocessable_content)
+    render json: { error: message }, status: status
+  end
 
     def render_unauthorized(message = "Unauthorized")
       render json: { error: message }, status: :unauthorized
+    end
+
+    def render_forbidden(message = "Forbidden")
+      render json: { message: message }, status: :forbidden
     end
 
     def render_not_found(message = "Resource not found")
