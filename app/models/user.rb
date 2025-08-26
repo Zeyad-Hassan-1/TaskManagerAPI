@@ -9,6 +9,7 @@ class User < ApplicationRecord
     has_many :projects, through: :project_memberships
     has_many :task_memberships, dependent: :destroy
     has_many :tasks, through: :task_memberships
+    has_many :comments, dependent: :destroy
     validates :username, uniqueness: true
 
     # returns the RAW token (client uses this), stores only SHA256 digest

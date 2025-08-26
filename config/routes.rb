@@ -34,6 +34,8 @@ Rails.application.routes.draw do
       resources :projects, except: [ :index, :create ] do
         # Nested tasks under projects
         resources :tasks, only: [ :index, :create ]
+        resources :tags, only: [ :create, :destroy ], controller: "project_tags"
+        resources :comments, only: [ :create, :update, :destroy ], controller: "project_comments"
 
         # Project member management
         member do
@@ -47,6 +49,8 @@ Rails.application.routes.draw do
       # Tasks (can also be accessed directly)
       resources :tasks, except: [ :index, :create ] do
         resources :sub_tasks, only: [ :index, :create ]
+        resources :tags, only: [ :create, :destroy ], controller: "task_tags"
+        resources :comments, only: [ :create, :update, :destroy ], controller: "task_comments"
         # Task member management
         member do
           post :assign_member
