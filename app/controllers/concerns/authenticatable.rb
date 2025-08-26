@@ -13,7 +13,7 @@ def encode_token(payload, exp = JwtRailsApiAuth.configuration.access_token_expir
   payload[:exp] = exp.to_i
   payload[:admin] = @user.admin? if @user.is_a?(User) && JwtRailsApiAuth.configuration.enable_roles
 
-  token = JWT.encode(payload, SECRET_KEY)
+  JWT.encode(payload, SECRET_KEY)
 end
 
     def decoded_token
@@ -41,7 +41,8 @@ end
       return @current_user if defined?(@current_user)
 
       if decoded_token
-        user_id = decoded_token[0]["user_id"]
+        # Support both 'sub' (standard JWT claim) and 'user_id' for flexibility
+        user_id = decoded_token[0]["sub"] || decoded_token[0]["user_id"]
         @current_user = User.find_by(id: user_id)
       else
         @current_user = nil

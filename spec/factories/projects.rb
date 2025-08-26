@@ -2,7 +2,7 @@ FactoryBot.define do
   factory :project do
     sequence(:name) { |n| "Project #{n}" }
     sequence(:description) { |n| "Description for project #{n}" }
-    team
+    association :team
 
     transient do
       owner { nil }

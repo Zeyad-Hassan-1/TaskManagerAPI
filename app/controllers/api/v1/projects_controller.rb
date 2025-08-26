@@ -164,7 +164,7 @@ module Api
       end
 
       def project_params
-        params.permit(:name, :description)
+        params.require(:project).permit(:name, :description)
       end
     end
   end

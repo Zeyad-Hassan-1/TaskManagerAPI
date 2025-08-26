@@ -1,5 +1,7 @@
 FactoryBot.define do
   factory :attachment do
-    link { "MyText" }
+    link { "http://example.com/file.pdf" }
+    association :user
+    association :attachable, factory: :task
   end
 end

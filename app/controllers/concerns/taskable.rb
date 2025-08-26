@@ -86,6 +86,6 @@ module Taskable
   end
 
   def task_params
-    params.permit(:name, :description, :priority, :due_date)
+    params.require(:task).permit(:name, :description, :priority, :due_date)
   end
 end

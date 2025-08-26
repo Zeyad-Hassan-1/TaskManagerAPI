@@ -156,7 +156,7 @@ module Api
       end
 
       def team_params
-        params.permit(:name, :description)
+        params.require(:team).permit(:name, :description)
       end
     end
   end
