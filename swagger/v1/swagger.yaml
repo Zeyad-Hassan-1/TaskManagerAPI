@@ -1,0 +1,1759 @@
+openapi: 3.0.0
+info:
+  title: Task manager API
+  version: 1.0.0
+servers:
+  - url: http://{{base_url}}
+components:
+  securitySchemes:
+    noauthAuth:
+      type: http
+      scheme: noauth
+tags:
+  - name: JWT Auth
+  - name: Team controller
+  - name: Team controller > members
+  - name: Project controller
+  - name: Project controller > comments
+  - name: Project controller > tags
+  - name: Project controller > members
+  - name: Project controller > attachments
+  - name: Tasks controller
+  - name: Tasks controller > Sub_tasks
+  - name: Tasks controller > comments
+  - name: Tasks controller > tags
+  - name: Tasks controller > members
+  - name: Tasks controller > attachments
+paths:
+  /signup:
+    post:
+      tags:
+        - JWT Auth
+      summary: signup
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                username: user21
+                email: usefr1@mail.com
+                password: '123456'
+                bio: test
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /login:
+    post:
+      tags:
+        - JWT Auth
+      summary: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                username: user2
+                password: new password
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /me:
+    get:
+      tags:
+        - JWT Auth
+      summary: me
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /password_resets:
+    post:
+      tags:
+        - JWT Auth
+      summary: password reset token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: user1@mail.com
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    put:
+      tags:
+        - JWT Auth
+      summary: password update
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                password: new password
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: token
+          in: query
+          schema:
+            type: string
+          example: h2DTi3VzEycEgmWwl-7IjA
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /refresh:
+    post:
+      tags:
+        - JWT Auth
+      summary: refresh access token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example: ''
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /logout:
+    post:
+      tags:
+        - JWT Auth
+      summary: logout
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example: ''
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /teams/{id}/invite_member:
+    post:
+      tags:
+        - Team controller > members
+      summary: invite member
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              example: '"{\n    \"username\": \"user21\",\n    \"role\": \"member\"\n}"'
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '27'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /teams/{id}/members/{user_id}:
+    delete:
+      tags:
+        - Team controller > members
+      summary: remove member
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '27'
+        - name: user_id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '48'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /teams/{id}/members/{user_id}/promote:
+    put:
+      tags:
+        - Team controller > members
+      summary: promote member
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example: ''
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '27'
+        - name: user_id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '48'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /teams/{id}/members/{user_id}/demote:
+    put:
+      tags:
+        - Team controller > members
+      summary: demote member
+      requestBody:
+        content: {}
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '27'
+        - name: user_id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '48'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /teams:
+    get:
+      tags:
+        - Team controller
+      summary: index teams
+      description: >-
+        This is a GET request and it is used to "get" data from an endpoint.
+        There is no request body for a GET request, but you can use query
+        parameters to help specify the resource you want data on (e.g., in this
+        request, we have `id=1`).
+
+
+        A successful GET response will have a `200 OK` status, and should
+        include some kind of response body - for example, HTML web content or
+        JSON data.
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    post:
+      tags:
+        - Team controller
+      summary: create teams
+      description: >-
+        This is a POST request, submitting data to an API via the request body.
+        This request submits JSON data, and the data is reflected in the
+        response.
+
+
+        A successful POST request typically returns a `200 OK` or `201 Created`
+        response code.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                team:
+                  name: Team 2
+                  description: description
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /teams/{id}:
+    get:
+      tags:
+        - Team controller
+      summary: show team
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '27'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    put:
+      tags:
+        - Team controller
+      summary: update team
+      description: >-
+        This is a PUT request and it is used to overwrite an existing piece of
+        data. For instance, after you create an entity with a POST request, you
+        may want to modify that later. You can do that using a PUT request. You
+        typically identify the entity being updated by including an identifier
+        in the URL (eg. `id=1`).
+
+
+        A successful PUT request typically returns a `200 OK`, `201 Created`, or
+        `204 No Content` response code.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                team:
+                  name: Team 1
+                  discription: team discription
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '27'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    delete:
+      tags:
+        - Team controller
+      summary: Delete team
+      description: >-
+        This is a DELETE request, and it is used to delete data that was
+        previously created via a POST request. You typically identify the entity
+        being updated by including an identifier in the URL (eg. `id=1`).
+
+
+        A successful DELETE request typically returns a `200 OK`, `202
+        Accepted`, or `204 No Content` response code.
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '28'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /projects/{project_id}/comments:
+    post:
+      tags:
+        - Project controller > comments
+      summary: add comment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                content: content of comment
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: project_id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '12'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /projects/{project_id}/comments/{id}:
+    delete:
+      tags:
+        - Project controller > comments
+      summary: remove comment
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: project_id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '12'
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '3'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    put:
+      tags:
+        - Project controller > comments
+      summary: update comment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                content: updated
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: project_id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '12'
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '3'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /projects/{project_id}/tags:
+    post:
+      tags:
+        - Project controller > tags
+      summary: add tag
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                name: tag 1
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: project_id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '12'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /projects/{project_id}/tags/{id}:
+    delete:
+      tags:
+        - Project controller > tags
+      summary: remove tag
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: project_id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '12'
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '3'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /projects/{id}/invite_member:
+    post:
+      tags:
+        - Project controller > members
+      summary: invite member
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              example: '"{\n    \"username\": \"user21\",\n    \"role\": \"member\"\n}"'
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '12'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /projects/{id}/members/{user_id}:
+    delete:
+      tags:
+        - Project controller > members
+      summary: remove member
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '12'
+        - name: user_id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '48'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /projects/{id}/members/{user_id}/promote:
+    put:
+      tags:
+        - Project controller > members
+      summary: promote member
+      requestBody:
+        content: {}
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '12'
+        - name: user_id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '48'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /projects/{id}/members/{user_id}/demote:
+    put:
+      tags:
+        - Project controller > members
+      summary: demote member
+      requestBody:
+        content: {}
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '12'
+        - name: user_id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '48'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /projects/{project_id}/attachments:
+    post:
+      tags:
+        - Project controller > attachments
+      summary: add attachment
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                link:
+                  type: string
+                  example: www.facebook.com
+                file:
+                  type: string
+                  format: binary
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: project_id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '12'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /projects/{project_id}/attachments/{id}:
+    delete:
+      tags:
+        - Project controller > attachments
+      summary: remove attachment
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: project_id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '12'
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '5'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /teams/{team_id}/projects:
+    get:
+      tags:
+        - Project controller
+      summary: index projects
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: team_id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '27'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    post:
+      tags:
+        - Project controller
+      summary: create project
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                project:
+                  name: project 1
+                  description: gyucflids.ljcofe;
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: team_id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '27'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /projects/{id}:
+    get:
+      tags:
+        - Project controller
+      summary: show project
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '11'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    put:
+      tags:
+        - Project controller
+      summary: update project
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                project:
+                  name: project 2
+                  discription: project discription
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '11'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    delete:
+      tags:
+        - Project controller
+      summary: delete project
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '11'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /tasks/{id}/sub_tasks:
+    get:
+      tags:
+        - Tasks controller > Sub_tasks
+      summary: index sub_tasks
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '14'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    post:
+      tags:
+        - Tasks controller > Sub_tasks
+      summary: create sub_task
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                task:
+                  name: sub_task 1
+                  description: description of sub task 1
+                  priority: 1
+                  due_date: '2025-08-25T10:20:00Z'
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '14'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /sub_tasks/{id}:
+    put:
+      tags:
+        - Tasks controller > Sub_tasks
+      summary: update sub_task
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                task:
+                  name: sub_task 1 edited
+                  description: description of sub task 1 edited
+                  priority: 2
+                  due_date: '2025-08-25T11:20:00Z'
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '14'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    delete:
+      tags:
+        - Tasks controller > Sub_tasks
+      summary: delete sub_task
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '15'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /sub_tasks/{id}/assign_member:
+    post:
+      tags:
+        - Tasks controller > Sub_tasks
+      summary: assign member sub_task
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                username: user21
+                role: assignee
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '15'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /sub_tasks/{id}/members/{user_id}:
+    delete:
+      tags:
+        - Tasks controller > Sub_tasks
+      summary: remove member sub_task
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '15'
+        - name: user_id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '48'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /tasks/{task_id}/comments:
+    post:
+      tags:
+        - Tasks controller > comments
+      summary: add comment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                content: content of comment
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: task_id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '14'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /tasks/{task_id}/comments/{id}:
+    delete:
+      tags:
+        - Tasks controller > comments
+      summary: remove comment
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: task_id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '14'
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '4'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    put:
+      tags:
+        - Tasks controller > comments
+      summary: update comment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                content: updated
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: task_id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '14'
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '4'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /tasks/{task_id}/tags:
+    post:
+      tags:
+        - Tasks controller > tags
+      summary: add tag
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                name: study
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: task_id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '14'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /tasks/{task_id}/tags/{id}:
+    delete:
+      tags:
+        - Tasks controller > tags
+      summary: remove tag
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: task_id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '14'
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '4'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /tasks/{id}/assign_member:
+    post:
+      tags:
+        - Tasks controller > members
+      summary: assign member
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                username: user21
+                role: assignee
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '14'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /tasks/{id}/members/{user_id}:
+    delete:
+      tags:
+        - Tasks controller > members
+      summary: remove member
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '14'
+        - name: user_id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '48'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /tasks/{id}/attachments:
+    post:
+      tags:
+        - Tasks controller > attachments
+      summary: add attachment
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                link:
+                  type: string
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '14'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /tasks/{task_id}/attachments/{id}:
+    delete:
+      tags:
+        - Tasks controller > attachments
+      summary: remove attachment
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: task_id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '14'
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '6'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /projects/{project_id}/tasks:
+    get:
+      tags:
+        - Tasks controller
+      summary: index tasks
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: project_id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '12'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    post:
+      tags:
+        - Tasks controller
+      summary: create task
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                task:
+                  name: task 1
+                  description: description of task 2
+                  priority: 1
+                  due_date: '2025-08-25T7:54:00Z'
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: project_id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '12'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /tasks/{id}:
+    get:
+      tags:
+        - Tasks controller
+      summary: show task
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '14'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    put:
+      tags:
+        - Tasks controller
+      summary: update task
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                task:
+                  name: task 1 edited
+                  description: description of task 2
+                  priority: 1
+                  due_date: '2025-08-25T7:54:00Z'
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '14'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    delete:
+      tags:
+        - Tasks controller
+      summary: delete task
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{token}}
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '14'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
