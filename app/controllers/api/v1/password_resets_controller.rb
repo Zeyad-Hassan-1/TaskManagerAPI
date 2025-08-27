@@ -10,7 +10,7 @@ module Api
         if user
           user.generate_password_reset_token!
           PasswordMailer.with(user: user).reset.deliver_now
-          render json: { message: "If an account with this email exists, we have sent a password reset link." }
+          render json: { message: "Reset instructions sent", token: user.reset_token }
         else
           render json: { error: "Username not found" }, status: :not_found
         end
