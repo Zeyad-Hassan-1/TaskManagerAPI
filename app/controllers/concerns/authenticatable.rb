@@ -21,18 +21,14 @@ end
       return nil unless header
 
       token = header.split(" ")[1]
-      puts "🔍 DECODE_TOKEN DEBUG: Token: #{token}"
 
       begin
         decoded = JWT.decode(token, SECRET_KEY, true, { algorithm: "HS256", verify_expiration: true })
-        puts "   Token valid, expires at: #{Time.at(decoded[0]['exp'])}" if decoded[0]["exp"]
         decoded
-      rescue JWT::ExpiredSignature => e
-        puts "   ❌ Token expired: #{e.message}"
+      rescue JWT::ExpiredSignature
         @token_expired = true
         nil
-      rescue JWT::DecodeError => e
-        puts "   ❌ Token decode error: #{e.message}"
+      rescue JWT::DecodeError
         nil
       end
     end
