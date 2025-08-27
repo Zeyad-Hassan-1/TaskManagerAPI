@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_26_192651) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_27_165337) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -42,6 +42,21 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_26_192651) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "activities", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "actor_type", null: false
+    t.bigint "actor_id", null: false
+    t.string "notifiable_type", null: false
+    t.bigint "notifiable_id", null: false
+    t.string "action"
+    t.datetime "read_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["actor_type", "actor_id"], name: "index_activities_on_actor"
+    t.index ["notifiable_type", "notifiable_id"], name: "index_activities_on_notifiable"
+    t.index ["user_id"], name: "index_activities_on_user_id"
+  end
+
   create_table "attachments", force: :cascade do |t|
     t.text "link"
     t.string "attachable_type"
@@ -63,6 +78,20 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_26_192651) do
     t.bigint "user_id", null: false
     t.index ["commentable_type", "commentable_id"], name: "index_comments_on_commentable"
     t.index ["user_id"], name: "index_comments_on_user_id"
+  end
+
+  create_table "invitations", force: :cascade do |t|
+    t.bigint "invitee_id", null: false
+    t.string "status", default: "pending"
+    t.string "role"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "inviter_id"
+    t.string "invitable_type", null: false
+    t.bigint "invitable_id", null: false
+    t.index ["invitable_type", "invitable_id"], name: "index_invitations_on_invitable"
+    t.index ["invitee_id"], name: "index_invitations_on_invitee_id"
+    t.index ["inviter_id"], name: "index_invitations_on_inviter_id"
   end
 
   create_table "project_memberships", force: :cascade do |t|
@@ -169,8 +198,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_26_192651) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "activities", "users"
   add_foreign_key "attachments", "users"
   add_foreign_key "comments", "users"
+  add_foreign_key "invitations", "users", column: "invitee_id"
+  add_foreign_key "invitations", "users", column: "inviter_id"
   add_foreign_key "project_memberships", "projects"
   add_foreign_key "project_memberships", "users"
   add_foreign_key "projects", "teams"

@@ -2,6 +2,7 @@ module Api
   module V1
     class TeamsController < Api::ApplicationController
       include Authorizable
+      include Notifiable
 
       before_action :set_team, only: [ :show, :update, :destroy, :invite_member, :remove_member, :promote_member, :demote_member ]
       before_action :ensure_member_access, only: [ :show ]
@@ -47,27 +48,31 @@ module Api
 
       # POST /api/v1/teams/:id/invite
       def invite_member
-        user = User.find_by(username: params[:username])
+        invitee = User.find_by(username: params[:username])
+        role = params[:role] || "member"
 
-        unless user
+        unless invitee
           return render_error("User not found", :not_found)
         end
 
-        if @team.team_memberships.exists?(user: user)
+        if @team.team_memberships.exists?(user: invitee)
           return render_error("User is already a member of this team")
         end
 
-        role = params[:role] || "member"
-        unless [ "member", "admin" ].include?(role)
-          return render_error("Invalid role. Must be 'member' or 'admin'")
-        end
-
-        @team.team_memberships.create!(
-          user: user,
-          role: role
+        invitation = Invitation.new(
+          inviter: current_user,
+          invitee: invitee,
+          invitable: @team,
+          role: role,
+          status: "pending"
         )
 
-        render_success({ message: "User invited successfully" }, :created)
+        if invitation.save
+          create_notification(invitee, invitation, "invited")
+          render_success({ message: "Invitation sent successfully." }, :created)
+        else
+          render_error(invitation.errors.full_messages.join(", "))
+        end
       end
 
       # DELETE /api/v1/teams/:id/members/:user_id

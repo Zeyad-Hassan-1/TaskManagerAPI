@@ -61,3 +61,5 @@ group :test do
   gem "selenium-webdriver", "~> 4.10"
   gem "webdrivers", "~> 5.3"
 end
+
+gem "letter_opener", "~> 1.10"

@@ -4,6 +4,12 @@ Rails.application.routes.draw do
   # API Versioning
   namespace :api do
     namespace :v1 do
+      resources :activities, only: [ :index ] do
+        collection do
+          post :mark_as_read
+        end
+      end
+      resources :invitations, only: [ :index, :update, :destroy ]
       # Authentication routes
       post "/login", to: "auth#login"
       post "/refresh", to: "auth#refresh"

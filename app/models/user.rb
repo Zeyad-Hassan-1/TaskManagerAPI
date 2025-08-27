@@ -11,6 +11,9 @@ class User < ApplicationRecord
     has_many :tasks, through: :task_memberships
     has_many :comments, dependent: :destroy
     has_many :attachments, dependent: :destroy
+    has_many :sent_invitations, class_name: "Invitation", as: :inviter, dependent: :destroy
+    has_many :received_invitations, class_name: "Invitation", foreign_key: "invitee_id", dependent: :destroy
+    has_many :activities, dependent: :destroy
     validates :username, presence: true, uniqueness: true
     validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
     validates :password, presence: true, length: { minimum: 6 }, on: :create

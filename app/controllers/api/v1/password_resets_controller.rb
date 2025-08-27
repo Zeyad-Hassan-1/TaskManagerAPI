@@ -9,11 +9,8 @@ module Api
         user = User.find_by("LOWER(email) = LOWER(?)", params[:email])
         if user
           user.generate_password_reset_token!
-          # Send token via your preferred method (API response, SMS, etc.)
-          render json: {
-            message: "Reset instructions sent",
-            token: user.reset_token # In production, send this via email/SMS instead
-          }
+          PasswordMailer.with(user: user).reset.deliver_now
+          render json: { message: "If an account with this email exists, we have sent a password reset link." }
         else
           render json: { error: "Username not found" }, status: :not_found
         end

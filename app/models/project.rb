@@ -7,6 +7,7 @@ class Project < ApplicationRecord
   has_many :tags, through: :taggings
   has_many :comments, as: :commentable
   has_many :attachments, as: :attachable
+  has_many :invitations, as: :invitable, dependent: :destroy
 
   validates :name, presence: true
   validates :description, presence: true
