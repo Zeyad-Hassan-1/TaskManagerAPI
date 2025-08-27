@@ -126,11 +126,12 @@ RSpec.describe "Api::V1::Projects", type: :request do
            params: { username: invited_user.username, role: "member" }
 
       expect(response).to have_http_status(:created)
-      expect(json_response['data']['message']).to eq("User invited successfully")
+      expect(json_response['data']['message']).to eq("Invitation sent successfully.")
 
-      membership = project.project_memberships.find_by(user: invited_user)
-      expect(membership).not_to be_nil
-      expect(membership.role).to eq('member')
+      invitation = Invitation.find_by(invitee: invited_user, invitable: project)
+      expect(invitation).not_to be_nil
+      expect(invitation.role).to eq('member')
+      expect(invitation.status).to eq('pending')
     end
 
     it "defaults to member role" do
@@ -139,8 +140,8 @@ RSpec.describe "Api::V1::Projects", type: :request do
            params: { username: invited_user.username }
 
       expect(response).to have_http_status(:created)
-      membership = project.project_memberships.find_by(user: invited_user)
-      expect(membership.role).to eq('member')
+      invitation = Invitation.find_by(invitee: invited_user, invitable: project)
+      expect(invitation.role).to eq('member')
     end
 
     it "validates user exists" do

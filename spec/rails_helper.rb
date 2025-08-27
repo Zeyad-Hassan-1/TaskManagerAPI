@@ -75,6 +75,14 @@ RSpec.configure do |config|
   # Include FactoryBot methods
   config.include FactoryBot::Syntax::Methods
 
+  # Configure Shoulda Matchers
+  Shoulda::Matchers.configure do |config|
+    config.integrate do |with|
+      with.test_framework :rspec
+      with.library :rails
+    end
+  end
+
   config.before(:suite) do
     JwtRailsApiAuth.configuration.jwt_secret = "test_secret"
   end

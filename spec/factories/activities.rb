@@ -1,9 +1,13 @@
 FactoryBot.define do
   factory :activity do
-    user { nil }
-    actor { nil }
-    notifiable { nil }
-    action { "MyString" }
-    read_at { "2025-08-27 18:59:00" }
+    association :user
+    association :actor, factory: :user
+    association :notifiable, factory: :team
+    action { "invited" }
+    read_at { nil }
+
+    trait :read do
+      read_at { Time.current }
+    end
   end
 end
