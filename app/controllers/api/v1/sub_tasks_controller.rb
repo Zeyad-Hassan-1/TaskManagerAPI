@@ -9,11 +9,17 @@ module Api
       # GET /api/v1/tasks/:task_id/sub_tasks
       def index
         @sub_tasks = @parent_task.sub_tasks
-        render_success(@sub_tasks)
+
+        serialized_sub_tasks = @sub_tasks.map do |sub_task|
+          SubTaskSerializer.new(sub_task).serializable_hash
+        end
+
+        render json: { data: serialized_sub_tasks }, status: :ok
       end
 
       def show
-        render_success(@task)
+        serialized_sub_task = SubTaskSerializer.new(@task).serializable_hash
+        render json: { data: serialized_sub_task }, status: :ok
       end
 
       # POST /api/v1/tasks/:task_id/sub_tasks
@@ -26,7 +32,9 @@ module Api
           @task = @parent_task.sub_tasks.create!(task_params.merge(project_id: @parent_task.project_id))
           @task.task_memberships.create!(user: current_user, role: :assignee)
         end
-        render_success(@task, :created)
+
+        serialized_sub_task = SubTaskSerializer.new(@task).serializable_hash
+        render json: { data: serialized_sub_task }, status: :created
       rescue ActiveRecord::RecordInvalid => e
         render_error(e.message)
       rescue ArgumentError => e

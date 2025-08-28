@@ -13,12 +13,18 @@ module Api
       def index
         @team = current_user.teams.find(params[:team_id])
         @projects = @team.projects
-        render_success(@projects)
+
+        serialized_projects = @projects.map do |project|
+          ProjectSerializer.new(project).serializable_hash
+        end
+
+        render json: { data: serialized_projects }, status: :ok
       end
 
       # GET /api/v1/projects/:id
       def show
-        render_success(@project)
+        serialized_project = ProjectSerializer.new(@project).serializable_hash
+        render json: { data: serialized_project }, status: :ok
       end
 
       # POST /api/v1/teams/:team_id/projects
@@ -34,7 +40,9 @@ module Api
           @project = @team.projects.create!(project_params)
           @project.project_memberships.create!(user: current_user, role: :owner)
         end
-        render_success(@project, :created)
+
+        serialized_project = ProjectSerializer.new(@project).serializable_hash
+        render json: { data: serialized_project }, status: :created
       rescue ActiveRecord::RecordInvalid => e
         render_error(e.message)
       end
@@ -42,7 +50,8 @@ module Api
       # PUT /api/v1/projects/:id
       def update
         if @project.update(project_params)
-          render_success(@project)
+          serialized_project = ProjectSerializer.new(@project).serializable_hash
+          render json: { data: serialized_project }, status: :ok
         else
           render_error(@project.errors.full_messages.join(", "))
         end

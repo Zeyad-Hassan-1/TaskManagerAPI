@@ -12,12 +12,18 @@ module Api
       # GET /api/v1/teams
       def index
         @teams = current_user.teams
-        render_success(@teams)
+
+        serialized_teams = @teams.map do |team|
+          TeamSerializer.new(team).serializable_hash
+        end
+
+        render json: { data: serialized_teams }, status: :ok
       end
 
       # GET /api/v1/teams/:id
       def show
-        render_success(@team)
+        serialized_team = TeamSerializer.new(@team).serializable_hash
+        render json: { data: serialized_team }, status: :ok
       end
 
       # POST /api/v1/teams
@@ -26,7 +32,9 @@ module Api
           @team = Team.create!(team_params)
           @team.team_memberships.create!(user: current_user, role: :owner)
         end
-          render_success(@team, :created)
+
+        serialized_team = TeamSerializer.new(@team).serializable_hash
+        render json: { data: serialized_team }, status: :created
       rescue ActiveRecord::RecordInvalid => e
         render_error(e.message)
       end
@@ -34,7 +42,8 @@ module Api
       # PUT /api/v1/teams/:id
       def update
         if @team.update(team_params)
-          render_success(@team)
+          serialized_team = TeamSerializer.new(@team).serializable_hash
+          render json: { data: serialized_team }, status: :ok
         else
           render_error(@team.errors.full_messages.join(", "))
         end

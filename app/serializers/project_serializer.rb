@@ -1,11 +1,14 @@
-class TeamSerializer < ActiveModel::Serializer
+class ProjectSerializer < ActiveModel::Serializer
   attributes :id, :name, :description, :created_at, :updated_at
 
-  has_many :users, serializer: UserSerializer
-  has_many :team_memberships
+  # Include team information
+  belongs_to :team, serializer: TeamSerializer
 
-  def team_memberships
-    object.team_memberships.includes(:user).map do |membership|
+  # Include project members with their roles
+  has_many :project_memberships
+
+  def project_memberships
+    object.project_memberships.includes(:user).map do |membership|
       {
         id: membership.id,
         user_id: membership.user_id,

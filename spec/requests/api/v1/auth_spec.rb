@@ -8,7 +8,7 @@ RSpec.describe "Api::V1::Auth", type: :request do
       post "/api/v1/login", params: { username: user.username, password: 'password123' }
 
       expect(response).to have_http_status(:ok)
-      expect(json_response['user']['username']).to eq(user.username)
+      expect(json_response['data']['username']).to eq(user.username)
       expect(json_response['access_token']).to be_present
       expect(response.cookies['refresh_token']).to be_present
     end

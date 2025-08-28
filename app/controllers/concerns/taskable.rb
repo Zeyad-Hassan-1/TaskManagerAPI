@@ -10,7 +10,8 @@ module Taskable
 
   def update
     if @task.update(task_params)
-      render_success(@task)
+      serialized_task = TaskSerializer.new(@task).serializable_hash
+      render json: { data: serialized_task }, status: :ok
     else
       render_error(@task.errors.full_messages.join(", "))
     end

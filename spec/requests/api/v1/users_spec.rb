@@ -10,16 +10,16 @@ RSpec.describe "Api::V1::Users", type: :request do
       }.to change(User, :count).by(1)
 
       expect(response).to have_http_status(:created)
-      expect(json_response['user']['username']).to eq('newuser')
-      expect(json_response['user']['email']).to eq('test@example.com')
-      expect(json_response['user']['bio']).to eq('Test bio')
+      expect(json_response['data']['username']).to eq('newuser')
+      expect(json_response['data']['email']).to eq('test@example.com')
+      expect(json_response['data']['bio']).to eq('Test bio')
       expect(json_response['token']).to be_present
     end
 
     it "returns user serialized data" do
       post "/api/v1/signup", params: valid_params
 
-      expect(json_response['user']).to include(
+      expect(json_response['data']).to include(
         'id',
         'username',
         'email',
@@ -96,7 +96,7 @@ RSpec.describe "Api::V1::Users", type: :request do
       }.to change(User, :count).by(1)
 
       expect(response).to have_http_status(:created)
-      expect(json_response['user']['bio']).to be_nil
+      expect(json_response['data']['bio']).to be_nil
     end
 
     it "handles multiple validation errors" do
@@ -115,9 +115,9 @@ RSpec.describe "Api::V1::Users", type: :request do
       get "/api/v1/me", headers: headers
 
       expect(response).to have_http_status(:ok)
-      expect(json_response['id']).to eq(user.id)
-      expect(json_response['username']).to eq(user.username)
-      expect(json_response['email']).to eq(user.email)
+      expect(json_response['data']['id']).to eq(user.id)
+      expect(json_response['data']['username']).to eq(user.username)
+      expect(json_response['data']['email']).to eq(user.email)
     end
 
     it "requires authentication" do

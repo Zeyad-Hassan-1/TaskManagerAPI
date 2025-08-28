@@ -13,7 +13,7 @@ module Api
           set_refresh_cookie(refresh_raw, 7.days.from_now)
 
           render json: {
-            user: UserSerializer.new(user),
+            data: UserSerializer.new(user).serializable_hash,
             access_token: access_token
             # (we're NOT returning refresh in JSON for security)
           }, status: :ok

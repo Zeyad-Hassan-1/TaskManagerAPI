@@ -8,12 +8,18 @@ module Api
       def index
         @project = current_user.projects.find(params[:project_id])
         @tasks = @project.tasks.where(parent_id: nil)
-        render_success(@tasks)
+
+        serialized_tasks = @tasks.map do |task|
+          TaskSerializer.new(task).serializable_hash
+        end
+
+        render json: { data: serialized_tasks }, status: :ok
       end
 
       # GET /api/v1/tasks/:id
       def show
-        render_success(@task)
+        serialized_task = TaskSerializer.new(@task).serializable_hash
+        render json: { data: serialized_task }, status: :ok
       end
 
       # POST /api/v1/projects/:project_id/tasks
@@ -29,7 +35,9 @@ module Api
           @task = @project.tasks.create!(task_params)
           @task.task_memberships.create!(user: current_user, role: :assignee)
         end
-        render_success(@task, :created)
+
+        serialized_task = TaskSerializer.new(@task).serializable_hash
+        render json: { data: serialized_task }, status: :created
       rescue ActiveRecord::RecordInvalid => e
         render_error(e.message)
       end

@@ -6,7 +6,12 @@ class Api::V1::InvitationsController < Api::ApplicationController
   # GET /api/v1/invitations
   def index
     @invitations = current_user.received_invitations.where(status: "pending")
-    render_success(@invitations)
+
+    serialized_invitations = @invitations.map do |invitation|
+      InvitationSerializer.new(invitation).serializable_hash
+    end
+
+    render json: { data: serialized_invitations }, status: :ok
   end
 
   # PUT /api/v1/invitations/:id

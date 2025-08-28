@@ -8,15 +8,18 @@ module Api
       def create
         user = User.create!(user_params)
         @token = encode_token(user_id: user.id)
+        serialized_user = UserSerializer.new(user).serializable_hash
+
         render json: {
-          user: UserSerializer.new(user),
+          data: serialized_user,
           token: @token
         }, status: :created
       end
 
       # GET /api/v1/users/me
       def me
-        render json: current_user, status: :ok
+        serialized_user = UserSerializer.new(current_user).serializable_hash
+        render json: { data: serialized_user }, status: :ok
       end
 
       private
