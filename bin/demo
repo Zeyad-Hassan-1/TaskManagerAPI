@@ -1,0 +1,45 @@
+#!/bin/bash
+
+# Task Manager API - Quick Demo Setup
+# This script sets up the API for demonstration purposes
+
+echo "🚀 Setting up Task Manager API for Demo..."
+
+# Check if Rails is available
+if ! command -v rails &> /dev/null; then
+    echo "❌ Rails is not installed. Please install Rails 8 first."
+    exit 1
+fi
+
+# Check if PostgreSQL is running
+if ! pg_isready &> /dev/null; then
+    echo "❌ PostgreSQL is not running. Please start PostgreSQL first."
+    exit 1
+fi
+
+# Install dependencies
+echo "📦 Installing dependencies..."
+bundle install --quiet
+
+# Setup database
+echo "🗄️  Setting up database..."
+rails db:create db:migrate db:seed --quiet
+
+# Clean tmp files
+echo "🧹 Cleaning temporary files..."
+rm -rf tmp/letter_opener/* tmp/cache/* tmp/pids/* log/* 2>/dev/null || true
+
+# Run tests to ensure everything works
+echo "🧪 Running tests..."
+bundle exec rspec --format progress --quiet
+
+# Start the server
+echo "✅ Setup complete!"
+echo ""
+echo "🌟 Task Manager API is ready!"
+echo "📖 API Documentation: http://localhost:3000/api-docs"
+echo "🔍 Health Check: http://localhost:3000/up"
+echo "🚀 Starting server..."
+echo ""
+
+rails server
