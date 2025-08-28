@@ -11,6 +11,101 @@ components:
       scheme: bearer
       bearerFormat: JWT
       description: Enter JWT token obtained from /login endpoint
+  schemas:
+    Invitation:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        status:
+          type: string
+          enum: [pending, accepted, declined]
+          example: pending
+        role:
+          type: string
+          example: member
+        inviter:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+            username:
+              type: string
+              example: john_doe
+            email:
+              type: string
+              example: john@example.com
+        invitable:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+            name:
+              type: string
+              example: My Team
+            type:
+              type: string
+              enum: [Team, Project]
+              example: Team
+        created_at:
+          type: string
+          format: date-time
+          example: "2024-01-01T00:00:00Z"
+    Activity:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        action:
+          type: string
+          example: invited
+        read_at:
+          type: string
+          format: date-time
+          nullable: true
+          example: null
+        actor:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+            username:
+              type: string
+              example: john_doe
+        notifiable:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+            name:
+              type: string
+              example: My Team
+            type:
+              type: string
+              enum: [Team, Project, Task]
+              example: Team
+        created_at:
+          type: string
+          format: date-time
+          example: "2024-01-01T00:00:00Z"
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Error message"
+    Success:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Operation successful"
 tags:
 - name: JWT Auth
 - name: Team controller
@@ -26,6 +121,8 @@ tags:
 - name: Tasks controller > tags
 - name: Tasks controller > members
 - name: Tasks controller > attachments
+- name: Invitations controller
+- name: Activities controller
 paths:
   /signup:
     post:
@@ -1555,3 +1652,183 @@ paths:
           description: Successful response
           content:
             application/json: {}
+  /invitations:
+    get:
+      tags:
+      - Invitations controller
+      summary: List pending invitations
+      description: Get all pending invitations for the current user
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Content-Type
+        in: header
+        schema:
+          type: string
+        example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Invitation'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /invitations/{id}:
+    put:
+      tags:
+      - Invitations controller
+      summary: Accept or decline invitation
+      description: Update the status of an invitation (accept or decline)
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Content-Type
+        in: header
+        schema:
+          type: string
+        example: application/json
+      - name: id
+        in: path
+        schema:
+          type: integer
+        required: true
+        example: '1'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [accepted, declined]
+                  example: accepted
+              required:
+              - status
+      responses:
+        '200':
+          description: Invitation updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '404':
+          description: Invitation not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Invalid status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+      - Invitations controller
+      summary: Decline invitation
+      description: Decline an invitation by deleting it
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Content-Type
+        in: header
+        schema:
+          type: string
+        example: application/json
+      - name: id
+        in: path
+        schema:
+          type: integer
+        required: true
+        example: '1'
+      responses:
+        '200':
+          description: Invitation declined successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '404':
+          description: Invitation not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /activities:
+    get:
+      tags:
+      - Activities controller
+      summary: List user activities
+      description: Get all activities/notifications for the current user
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Content-Type
+        in: header
+        schema:
+          type: string
+        example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Activity'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /activities/mark_as_read:
+    post:
+      tags:
+      - Activities controller
+      summary: Mark all notifications as read
+      description: Mark all unread notifications as read for the current user
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Content-Type
+        in: header
+        schema:
+          type: string
+        example: application/json
+      responses:
+        '200':
+          description: Notifications marked as read successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'

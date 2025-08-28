@@ -37,6 +37,20 @@ gem "thruster", require: false
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 gem "image_processing", "~> 1.2"
+
+# Cloud Storage Support (install only what you need)
+gem "aws-sdk-s3", "~> 1.0", require: false  # For Amazon S3
+# gem "google-cloud-storage", "~> 1.0", require: false  # For Google Cloud Storage
+# gem "azure-storage-blob", "~> 2.0", require: false  # For Azure Storage
+
+# Production monitoring and error tracking (optional)
+# gem "sentry-ruby", require: false
+# gem "sentry-rails", require: false
+# gem "newrelic_rpm", require: false
+
+# Rate limiting and security
+gem "rack-attack", require: false
+
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin Ajax possible
 # gem "rack-cors"
 
@@ -54,6 +68,7 @@ group :development, :test do
   gem "rspec-rails", "~> 6.0"
   gem "factory_bot_rails", "~> 6.4"
   gem "faker", "~> 3.2"
+  gem "shoulda-matchers", "~> 6.0"
 end
 
 group :test do
