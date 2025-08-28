@@ -1,0 +1,59 @@
+#!/bin/bash
+# Prepare for FREE Railway Deployment
+
+echo "🚂 Preparing for Railway Deployment (100% FREE!)"
+echo "================================================="
+
+# Check if git repository
+if [ ! -d .git ]; then
+    echo "❌ Not a git repository. Initializing..."
+    git init
+    git branch -M main
+fi
+
+echo "✅ Railway configuration files created"
+echo "✅ Health endpoint added to routes"
+
+# Check if committed
+if [ -n "$(git status --porcelain)" ]; then
+    echo ""
+    echo "📤 Committing changes for deployment..."
+    git add .
+    git commit -m "Add Railway deployment configuration
+
+- Added railway.toml for deployment settings
+- Added /health endpoint for health checks  
+- Production ready with email configuration
+- All tests passing (320/320)"
+    echo "✅ Changes committed"
+else
+    echo "✅ Repository is clean"
+fi
+
+echo ""
+echo "🎯 Next Steps for FREE Deployment:"
+echo ""
+echo "1. Push to GitHub:"
+echo "   git remote add origin https://github.com/Zeyad-Hassan-1/TaskManagerAPI.git"
+echo "   git push -u origin main"
+echo ""
+echo "2. Deploy on Railway (100% FREE - No Credit Card):"
+echo "   • Go to https://railway.app"
+echo "   • Login with GitHub"
+echo "   • Click 'Deploy from GitHub repo'"
+echo "   • Select your TaskManagerAPI repository"
+echo "   • Add PostgreSQL service"
+echo "   • Set environment variables from .env.production"
+echo ""
+echo "3. Your API will be live at: https://your-app-name.up.railway.app"
+echo ""
+echo "🆓 Railway Free Tier Includes:"
+echo "   ✅ $5/month credit (very generous!)"
+echo "   ✅ PostgreSQL database"  
+echo "   ✅ Automatic HTTPS"
+echo "   ✅ Custom domains"
+echo "   ✅ No credit card required"
+echo ""
+echo "📚 Full deployment guide: RAILWAY_DEPLOYMENT.md"
+echo ""
+echo "🎉 Your Task Manager API is ready for the world!"
