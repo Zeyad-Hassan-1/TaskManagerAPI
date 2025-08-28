@@ -164,25 +164,10 @@ The application includes comprehensive tests covering:
 
 This API is ready for production deployment with comprehensive guides for different platforms.
 
-### 🚀 Quick Deploy Options
-
-**Free Deployment (No Credit Card Required):**
-- **[Render.com](docs/RENDER_DEPLOYMENT.md)** - Easy setup, spins down after 15min
-- **[Railway](docs/RAILWAY_DEPLOYMENT.md)** - $5/month credit, best performance
-- **Fly.io** - Great performance, CLI-based
-
-**Use deployment helper scripts:**
-```bash
-# For Render.com
-./bin/deploy-render
-
-# Check production configuration
-./bin/production-check
-```
-
 ### 📋 Production Features
 
 ✅ **Complete Configuration**
+
 - JWT authentication with secure secrets
 - Gmail SMTP integration for password resets
 - Multi-database setup (primary, cache, queue, cable)
@@ -190,20 +175,12 @@ This API is ready for production deployment with comprehensive guides for differ
 - Rate limiting and security headers
 
 ✅ **Production Ready**
+
 - All 320 tests passing
 - Comprehensive error handling
 - API documentation included
 - Health check endpoints
 - Database migrations ready
-
-### 📚 Deployment Guides
-
-- **[Production Deployment Guide](docs/PRODUCTION_DEPLOYMENT.md)** - Complete production setup
-- **[Render.com Deployment](docs/RENDER_DEPLOYMENT.md)** - Free tier deployment
-- **[Railway Deployment](docs/RAILWAY_DEPLOYMENT.md)** - Premium free tier
-- **[Service Setup Guide](docs/SERVICE_SETUP.md)** - Configure external services
-
-## Configuration
 
 ### Storage Services
 
