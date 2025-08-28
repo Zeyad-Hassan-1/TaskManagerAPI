@@ -5,4 +5,7 @@ class TaskSerializer < ActiveModel::Serializer
   belongs_to :project, serializer: ProjectSerializer
   has_many :users, serializer: UserSerializer
   has_many :sub_tasks, serializer: SubTaskSerializer
+  has_many :comments
+  has_many :tags
+
 end

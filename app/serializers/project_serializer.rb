@@ -6,6 +6,8 @@ class ProjectSerializer < ActiveModel::Serializer
 
   # Include project members with their roles
   has_many :project_memberships
+  has_many :comments
+  has_many :tags
 
   def project_memberships
     object.project_memberships.includes(:user).map do |membership|
