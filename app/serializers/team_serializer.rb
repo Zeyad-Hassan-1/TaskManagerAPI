@@ -1,7 +1,6 @@
 class TeamSerializer < ActiveModel::Serializer
   attributes :id, :name, :description, :created_at, :updated_at
 
-  has_many :users, serializer: UserSerializer
   has_many :team_memberships
 
   def team_memberships
