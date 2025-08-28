@@ -38,5 +38,5 @@ mirror:
 
 # Production configuration - uses environment variable to choose service
 production:
-  service: <%= ENV.fetch("ACTIVE_STORAGE_SERVICE", "local").capitalize %>
-  <<: *<%= ENV.fetch("ACTIVE_STORAGE_SERVICE", "local") %>
+  service: Disk
+  root: <%= Rails.root.join("storage") %>

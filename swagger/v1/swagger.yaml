@@ -3,7 +3,10 @@ info:
   title: Task manager API
   version: 1.0.0
 servers:
+- url: https://exciting-hopefully-joey.ngrok-free.app/api/v1
+  description: Production server (static ngrok domain)
 - url: http://localhost:3000/api/v1
+  description: Local development server
 components:
   securitySchemes:
     bearerAuth:

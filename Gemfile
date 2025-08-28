@@ -77,4 +77,4 @@ group :test do
   gem "webdrivers", "~> 5.3"
 end
 
-gem "letter_opener", "~> 1.10"
+gem "letter_opener", "~> 1.10"  # For email preview in development

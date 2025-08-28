@@ -12,6 +12,13 @@ Rails.application.configure do
   # Show full error reports.
   config.consider_all_requests_local = true
 
+  # Allow ngrok and other tunneling services
+  config.hosts << /[a-z0-9]+\.ngrok-free\.app/
+  config.hosts << /[a-z0-9]+\.ngrok\.io/
+
+  # Allow specific static ngrok domain
+  config.hosts << "exciting-hopefully-joey.ngrok-free.app"
+
   # Enable server timing.
   config.server_timing = true
 
@@ -30,7 +37,7 @@ Rails.application.configure do
   config.active_storage.service = :local
 
   # Don't care if the mailer can't send.
-  config.action_mailer.raise_delivery_errors = false
+  config.action_mailer.raise_delivery_errors = true
 
   # Make template changes take effect immediately.
   config.action_mailer.perform_caching = false
@@ -38,11 +45,21 @@ Rails.application.configure do
   # Set localhost to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
 
-  # Use letter_opener to preview emails in the browser
-  config.action_mailer.delivery_method = :letter_opener
+  # Use Gmail SMTP for actual email sending
+  config.action_mailer.delivery_method = :smtp
   config.action_mailer.perform_deliveries = true
 
-  # Print deprecation notices to the Rails logger.
+  config.action_mailer.smtp_settings = {
+    address: "smtp.gmail.com",
+    port: 587,
+    domain: "gmail.com",
+    user_name: "Zeyad.h.dev@gmail.com",
+    password: "xgvs cpsc ouyg ezsw",
+    authentication: "plain",
+    enable_starttls_auto: true,
+    open_timeout: 5,
+    read_timeout: 5
+  }  # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
 
   # Raise an error on page load if there are pending migrations.
