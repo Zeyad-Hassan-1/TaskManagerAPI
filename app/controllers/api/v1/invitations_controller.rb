@@ -20,9 +20,9 @@ class Api::V1::InvitationsController < Api::ApplicationController
       if @invitation.update(status: params[:status])
         if @invitation.accepted?
           add_user_to_membership
-          create_notification(@invitation.inviter, @invitation, "accepted")
+          create_notification(@invitation.inviter, @invitation.invitable, "accepted")
         else
-          create_notification(@invitation.inviter, @invitation, "declined")
+          create_notification(@invitation.inviter, @invitation.invitable, "declined")
         end
         render_success({ message: "Invitation #{params[:status]} successfully." })
       else

@@ -12,7 +12,11 @@ class Api::V1::ActivitiesController < Api::ApplicationController
         actor: activity.actor ? { id: activity.actor.id, username: activity.actor.username } : nil,
         notifiable: activity.notifiable ? {
           id: activity.notifiable.id,
-          name: activity.notifiable.try(:name) || activity.notifiable.try(:username) || "Unknown",
+          name: if activity.notifiable_type == "Invitation"
+                  activity.notifiable.invitable.try(:name) || activity.notifiable.invitable.try(:username) || "Unknown"
+                else
+                  activity.notifiable.try(:name) || activity.notifiable.try(:username) || "Unknown"
+                end,
           type: activity.notifiable_type
         } : nil
       }
