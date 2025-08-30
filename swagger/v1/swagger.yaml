@@ -8,7 +8,7 @@ paths:
     post:
       summary: create
       tags:
-      - Api::V1::User
+      - User
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -110,7 +110,7 @@ paths:
     post:
       summary: login
       tags:
-      - Api::V1::Auth
+      - Auth
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -197,7 +197,7 @@ paths:
     post:
       summary: logout
       tags:
-      - Api::V1::Auth
+      - Auth
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -228,7 +228,7 @@ paths:
     get:
       summary: me
       tags:
-      - Api::V1::User
+      - User
       responses:
         '200':
           description: returns current user information
@@ -296,7 +296,7 @@ paths:
     post:
       summary: create
       tags:
-      - Api::V1::PasswordReset
+      - PasswordReset
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -343,7 +343,7 @@ paths:
     put:
       summary: update
       tags:
-      - Api::V1::PasswordReset
+      - PasswordReset
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -395,7 +395,7 @@ paths:
     post:
       summary: refresh
       tags:
-      - Api::V1::Auth
+      - Auth
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -441,7 +441,7 @@ paths:
     get:
       summary: index
       tags:
-      - Api::V1::Team
+      - Team
       responses:
         '200':
           description: returns a list of teams
@@ -517,7 +517,7 @@ paths:
     post:
       summary: create
       tags:
-      - Api::V1::Team
+      - Team
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -614,7 +614,7 @@ paths:
     get:
       summary: show
       tags:
-      - Api::V1::Team
+      - Team
       parameters:
       - name: id
         in: path
@@ -696,7 +696,7 @@ paths:
     get:
       summary: index
       tags:
-      - Api::V1::Project
+      - Project
       parameters:
       - name: team_id
         in: path
@@ -912,7 +912,7 @@ paths:
     post:
       summary: create
       tags:
-      - Api::V1::Project
+      - Project
       parameters:
       - name: team_id
         in: path
@@ -1091,7 +1091,7 @@ paths:
     delete:
       summary: destroy
       tags:
-      - Api::V1::Project
+      - Project
       parameters:
       - name: id
         in: path
@@ -1137,7 +1137,7 @@ paths:
     get:
       summary: show
       tags:
-      - Api::V1::Project
+      - Project
       parameters:
       - name: id
         in: path
@@ -1282,7 +1282,7 @@ paths:
     put:
       summary: update
       tags:
-      - Api::V1::Project
+      - Project
       parameters:
       - name: id
         in: path
@@ -1447,7 +1447,7 @@ paths:
     post:
       summary: add_attachment
       tags:
-      - Api::V1::Project
+      - Project
       parameters:
       - name: id
         in: path
@@ -1602,7 +1602,7 @@ paths:
     post:
       summary: add_comment
       tags:
-      - Api::V1::Project
+      - Project
       parameters:
       - name: id
         in: path
@@ -1730,7 +1730,7 @@ paths:
     post:
       summary: add_tag
       tags:
-      - Api::V1::Project
+      - Project
       parameters:
       - name: id
         in: path
@@ -1819,7 +1819,7 @@ paths:
     delete:
       summary: remove_attachment
       tags:
-      - Api::V1::Project
+      - Project
       parameters:
       - name: attachment_id
         in: path
@@ -1879,7 +1879,7 @@ paths:
     delete:
       summary: remove_comment
       tags:
-      - Api::V1::Project
+      - Project
       parameters:
       - name: comment_id
         in: path
@@ -1939,7 +1939,7 @@ paths:
     post:
       summary: invite_member
       tags:
-      - Api::V1::Project
+      - Project
       parameters:
       - name: id
         in: path
@@ -2014,7 +2014,7 @@ paths:
     delete:
       summary: remove_member
       tags:
-      - Api::V1::Project
+      - Project
       parameters:
       - name: id
         in: path
@@ -2067,7 +2067,7 @@ paths:
     put:
       summary: demote_member
       tags:
-      - Api::V1::Project
+      - Project
       parameters:
       - name: id
         in: path
@@ -2127,7 +2127,7 @@ paths:
     put:
       summary: promote_member
       tags:
-      - Api::V1::Project
+      - Project
       parameters:
       - name: id
         in: path
@@ -2187,7 +2187,7 @@ paths:
     delete:
       summary: remove_tag
       tags:
-      - Api::V1::Project
+      - Project
       parameters:
       - name: id
         in: path
@@ -2247,7 +2247,7 @@ paths:
     get:
       summary: index
       tags:
-      - Api::V1::Task
+      - Task
       parameters:
       - name: project_id
         in: path
@@ -2436,7 +2436,7 @@ paths:
     post:
       summary: create
       tags:
-      - Api::V1::Task
+      - Task
       parameters:
       - name: project_id
         in: path
@@ -2654,7 +2654,7 @@ paths:
     delete:
       summary: destroy
       tags:
-      - Api::V1::Task
+      - Task
       parameters:
       - name: id
         in: path
@@ -2687,7 +2687,7 @@ paths:
     get:
       summary: show
       tags:
-      - Api::V1::Task
+      - Task
       parameters:
       - name: id
         in: path
@@ -2900,7 +2900,7 @@ paths:
     put:
       summary: update
       tags:
-      - Api::V1::Task
+      - Task
       parameters:
       - name: id
         in: path
@@ -3106,7 +3106,7 @@ paths:
     post:
       summary: assign_member
       tags:
-      - Api::V1::Task
+      - Task
       parameters:
       - name: id
         in: path
@@ -3196,7 +3196,7 @@ paths:
     delete:
       summary: remove_member
       tags:
-      - Api::V1::Task
+      - Task
       parameters:
       - name: id
         in: path
@@ -3279,7 +3279,7 @@ paths:
     post:
       summary: create
       tags:
-      - Api::V1::TaskAttachment
+      - TaskAttachment
       parameters:
       - name: task_id
         in: path
@@ -3412,7 +3412,7 @@ paths:
     delete:
       summary: destroy
       tags:
-      - Api::V1::TaskAttachment
+      - TaskAttachment
       parameters:
       - name: id
         in: path
@@ -3471,7 +3471,7 @@ paths:
     get:
       summary: download
       tags:
-      - Api::V1::TaskAttachment
+      - TaskAttachment
       parameters:
       - name: id
         in: path
@@ -3528,7 +3528,7 @@ paths:
     post:
       summary: create
       tags:
-      - Api::V1::TaskComment
+      - TaskComment
       parameters:
       - name: task_id
         in: path
@@ -3624,7 +3624,7 @@ paths:
     delete:
       summary: destroy
       tags:
-      - Api::V1::TaskComment
+      - TaskComment
       parameters:
       - name: id
         in: path
@@ -3682,7 +3682,7 @@ paths:
     put:
       summary: update
       tags:
-      - Api::V1::TaskComment
+      - TaskComment
       parameters:
       - name: id
         in: path
@@ -3771,7 +3771,7 @@ paths:
     get:
       summary: index
       tags:
-      - Api::V1::SubTask
+      - SubTask
       parameters:
       - name: task_id
         in: path
@@ -3909,7 +3909,7 @@ paths:
     post:
       summary: create
       tags:
-      - Api::V1::SubTask
+      - SubTask
       parameters:
       - name: task_id
         in: path
@@ -4153,7 +4153,7 @@ paths:
     post:
       summary: create
       tags:
-      - Api::V1::TaskTag
+      - TaskTag
       parameters:
       - name: task_id
         in: path
@@ -4239,7 +4239,7 @@ paths:
     delete:
       summary: destroy
       tags:
-      - Api::V1::TaskTag
+      - TaskTag
       parameters:
       - name: id
         in: path
@@ -4298,7 +4298,7 @@ paths:
     delete:
       summary: destroy
       tags:
-      - Api::V1::SubTask
+      - SubTask
       parameters:
       - name: id
         in: path
@@ -4344,7 +4344,7 @@ paths:
     get:
       summary: show
       tags:
-      - Api::V1::SubTask
+      - SubTask
       parameters:
       - name: id
         in: path
@@ -4552,7 +4552,7 @@ paths:
     put:
       summary: update
       tags:
-      - Api::V1::SubTask
+      - SubTask
       parameters:
       - name: id
         in: path
@@ -4785,7 +4785,7 @@ paths:
     get:
       summary: index
       tags:
-      - Api::V1::Invitation
+      - Invitation
       responses:
         '200':
           description: returns http success
@@ -4892,7 +4892,7 @@ paths:
     delete:
       summary: destroy
       tags:
-      - Api::V1::Invitation
+      - Invitation
       parameters:
       - name: id
         in: path
@@ -4938,7 +4938,7 @@ paths:
     put:
       summary: update
       tags:
-      - Api::V1::Invitation
+      - Invitation
       parameters:
       - name: id
         in: path
@@ -5010,7 +5010,7 @@ paths:
     get:
       summary: index
       tags:
-      - Api::V1::Activity
+      - Activity
       responses:
         '200':
           description: returns http success
@@ -5072,7 +5072,7 @@ paths:
     put:
       summary: mark_all_read
       tags:
-      - Api::V1::Activity
+      - Activity
       requestBody:
         content:
           application/x-www-form-urlencoded:
