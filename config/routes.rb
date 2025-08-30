@@ -1,12 +1,15 @@
 Rails.application.routes.draw do
-  mount Rswag::Ui::Engine => "/api-docs"
-  mount Rswag::Api::Engine => "/api-docs"
+  mount Rswag::Ui::Engine => '/api-docs'
+  mount Rswag::Api::Engine => '/api-docs'
   # API Versioning
   namespace :api do
     namespace :v1 do
       resources :activities, only: [ :index ] do
+        member do
+          put :read
+        end
         collection do
-          post :mark_as_read
+          put :mark_all_read
         end
       end
       resources :invitations, only: [ :index, :update, :destroy ]
@@ -16,6 +19,9 @@ Rails.application.routes.draw do
       post "/logout", to: "auth#logout"
       post "/signup", to: "users#create"
       get "/me", to: "users#me"
+      put "/profile", to: "users#update_profile"
+      put "/change_password", to: "users#change_password"
+      post "/profile/picture", to: "users#upload_profile_picture"
 
       # Password resets
       resources :password_resets, only: [ :create ] do
@@ -42,16 +48,21 @@ Rails.application.routes.draw do
       resources :projects, except: [ :index, :create ] do
         # Nested tasks under projects
         resources :tasks, only: [ :index, :create ]
-        resources :tags, only: [ :create, :destroy ], controller: "project_tags"
-        resources :comments, only: [ :create, :update, :destroy ], controller: "project_comments"
-        resources :attachments, only: [ :create, :destroy ], controller: "project_attachments"
 
-        # Project member management
+        # Project features
         member do
           post :invite_member
           delete "members/:user_id", to: "projects#remove_member", as: :remove_member
           put "members/:user_id/promote", to: "projects#promote_member", as: :promote_member
           put "members/:user_id/demote", to: "projects#demote_member", as: :demote_member
+
+          # Comments, tags, attachments
+          post :add_comment
+          delete "comments/:comment_id", to: "projects#remove_comment", as: :remove_comment
+          post :add_tag
+          delete "tags/:tag_id", to: "projects#remove_tag", as: :remove_tag
+          post :add_attachment
+          delete "attachments/:attachment_id", to: "projects#remove_attachment", as: :remove_attachment
         end
       end
 
@@ -60,7 +71,11 @@ Rails.application.routes.draw do
         resources :sub_tasks, only: [ :index, :create ]
         resources :tags, only: [ :create, :destroy ], controller: "task_tags"
         resources :comments, only: [ :create, :update, :destroy ], controller: "task_comments"
-        resources :attachments, only: [ :create, :destroy ], controller: "task_attachments"
+        resources :attachments, only: [ :create, :destroy ], controller: "task_attachments" do
+          member do
+            get :download
+          end
+        end
         # Task member management
         member do
           post :assign_member

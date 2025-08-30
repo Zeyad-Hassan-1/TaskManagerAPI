@@ -14,7 +14,7 @@ RSpec.describe "Api::V1::ProjectAttachments", type: :request do
   describe "POST /api/v1/projects/:project_id/add_attachment" do
     context "with file upload" do
       let(:file) { fixture_file_upload('test_file.txt', 'text/plain') }
-      let(:file_params) { { attachment: { file: file } } }  # Remove description since model doesn't have it
+      let(:file_params) { { attachment: { file: file, description: "Test Document" } } }
 
       it "creates attachment with file upload" do
         expect {
@@ -24,6 +24,7 @@ RSpec.describe "Api::V1::ProjectAttachments", type: :request do
         expect(response).to have_http_status(:created)
 
         attachment = project.attachments.last
+        expect(attachment.description).to eq("Test Document")
         expect(attachment.user).to eq(user)
         expect(attachment.file).to be_attached
       end
@@ -31,6 +32,7 @@ RSpec.describe "Api::V1::ProjectAttachments", type: :request do
       it "returns attachment details with file metadata" do
         post "/api/v1/projects/#{project.id}/add_attachment", headers: headers, params: file_params
 
+        expect(json_response['data']['description']).to eq("Test Document")
         expect(json_response['data']['file_url']).to be_present
         expect(json_response['data']['content_type']).to eq("text/plain")
       end
@@ -40,15 +42,16 @@ RSpec.describe "Api::V1::ProjectAttachments", type: :request do
 
         expect(response).to have_http_status(:created)
         attachment = project.attachments.last
+        expect(attachment.description).to be_nil
         expect(attachment.file).to be_attached
       end
     end
 
     it "requires file attachment" do
-      post "/api/v1/projects/#{project.id}/add_attachment", headers: headers, params: { attachment: {} }
+      post "/api/v1/projects/#{project.id}/add_attachment", headers: headers, params: { attachment: { description: "No File" } }
 
-      expect(response).to have_http_status(:bad_request)
-      # Don't check JSON response since it returns HTML error page
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(json_response['error']).to include("File can't be blank")
     end
 
     it "requires project membership" do

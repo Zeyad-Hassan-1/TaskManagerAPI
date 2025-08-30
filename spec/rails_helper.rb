@@ -1,10 +1,12 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 require 'spec_helper'
+# require 'swagger_helper'
 ENV['RAILS_ENV'] ||= 'test'
 require_relative '../config/environment'
 # Prevent database truncation if the environment is production
 abort("The Rails environment is running in production mode!") if Rails.env.production?
 require 'rspec/rails'
+require 'rspec/openapi'
 # Add additional requires below this line. Rails is not loaded until this point!
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
@@ -86,4 +88,23 @@ RSpec.configure do |config|
   config.before(:suite) do
     JwtRailsApiAuth.configuration.jwt_secret = "test_secret"
   end
+
+  # Configure rspec-openapi
+  config.openapi_root = Rails.root.join('doc').to_s
+  config.openapi_specs = {
+    'openapi.yaml' => {
+      openapi: '3.0.3',
+      info: {
+        title: 'Task Manager API',
+        version: '1.0.0',
+        description: 'API documentation for Task Manager application'
+      },
+      servers: [
+        {
+          url: 'http://localhost:3000',
+          description: 'Development server'
+        }
+      ]
+    }
+  }
 end

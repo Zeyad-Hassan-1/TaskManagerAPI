@@ -24,7 +24,7 @@ RSpec.describe "Api::V1::Projects", type: :request do
     it "requires team membership" do
       other_team = create(:team)
       get "/api/v1/teams/#{other_team.id}/projects", headers: headers
-      expect(response).to have_http_status(:not_found)
+      expect(response).to have_http_status(:forbidden)
     end
   end
 
@@ -40,7 +40,7 @@ RSpec.describe "Api::V1::Projects", type: :request do
       other_user = create(:user)
       other_headers = auth_headers_for(other_user)
       get "/api/v1/projects/#{project.id}", headers: other_headers
-      expect(response).to have_http_status(:not_found)
+      expect(response).to have_http_status(:forbidden)
     end
   end
 
@@ -119,6 +119,11 @@ RSpec.describe "Api::V1::Projects", type: :request do
 
   describe "POST /api/v1/projects/:id/invite_member" do
     let(:invited_user) { create(:user) }
+
+    before do
+      # User must be a team member before being invited to projects
+      create(:team_membership, user: invited_user, team: team, role: :member)
+    end
 
     it "invites a user to the project" do
       post "/api/v1/projects/#{project.id}/invite_member",

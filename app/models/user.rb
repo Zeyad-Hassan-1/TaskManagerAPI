@@ -14,10 +14,23 @@ class User < ApplicationRecord
     has_many :sent_invitations, class_name: "Invitation", foreign_key: "inviter_id", dependent: :destroy
     has_many :received_invitations, class_name: "Invitation", foreign_key: "invitee_id", dependent: :destroy
     has_many :activities, dependent: :destroy
-    validates :username, presence: true, uniqueness: true
+    has_one_attached :profile_picture
+    validates :username, presence: true, uniqueness: true, format: { with: /\A[a-zA-Z0-9_]+\z/, message: "can only contain letters, numbers, and underscores" }
     validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
-    validates :password, presence: true, length: { minimum: 6 }, on: :create
-    validates :password, length: { minimum: 6 }, allow_blank: false, if: :password_digest_changed?
+    validates :password, presence: true, length: { minimum: 8 }, format: {
+      with: /\A(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+\z/,
+      message: "must contain at least one lowercase letter, one uppercase letter, one digit, and one special character (@$!%*?&)"
+    }, on: :create
+    validates :password, length: { minimum: 8 }, format: {
+      with: /\A(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+\z/,
+      message: "must contain at least one lowercase letter, one uppercase letter, one digit, and one special character (@$!%*?&)"
+    }, allow_blank: false, if: :password_digest_changed?
+
+    def profile_picture_url
+        if profile_picture.attached?
+            Rails.application.routes.url_helpers.rails_blob_url(profile_picture, only_path: true)
+        end
+    end
 
     # returns the RAW token (client uses this), stores only SHA256 digest
     def generate_refresh_token

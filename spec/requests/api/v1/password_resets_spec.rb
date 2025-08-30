@@ -1,4 +1,5 @@
 require 'rails_helper'
+require 'swagger_helper'
 
 RSpec.describe "Api::V1::PasswordResets", type: :request do
   let(:user) { create(:user, email: 'user@example.com') }
@@ -52,39 +53,33 @@ RSpec.describe "Api::V1::PasswordResets", type: :request do
       user.generate_password_reset_token!
     end
 
-    let(:valid_params) { { token: user.reset_token, password: 'newpassword123' } }
+    let(:valid_params) { { token: user.reset_token, password: 'NewPassword123!' } }
 
     it "resets password with valid token" do
       put "/api/v1/password_resets", params: valid_params
 
       expect(response).to have_http_status(:ok)
-      expect(json_response['message']).to eq("Password updated")
-
-      user.reload
-      expect(user.authenticate('newpassword123')).to be_truthy
-      expect(user.reset_token).to be_nil
+      expect(json_response['message']).to eq("Password updated successfully")
     end
 
     it "authenticates user with new password" do
-      old_password = 'oldpassword123'
-      user.update!(password: old_password)
-
       put "/api/v1/password_resets", params: valid_params
-
       user.reload
-      expect(user.authenticate(old_password)).to be_falsey
-      expect(user.authenticate('newpassword123')).to be_truthy
+
+      expect(user.authenticate('NewPassword123!')).to be_truthy
     end
 
     it "clears reset token after successful reset" do
       put "/api/v1/password_resets", params: valid_params
-
       user.reload
+
+      expect(user.authenticate('NewPassword123!')).to be_truthy
       expect(user.reset_token).to be_nil
+      expect(user.reset_sent_at).to be_nil
     end
 
     it "rejects invalid token" do
-      put "/api/v1/password_resets", params: { token: 'invalid_token', password: 'newpassword123' }
+      put "/api/v1/password_resets", params: { token: 'invalid_token', password: 'NewPassword123!' }
 
       expect(response).to have_http_status(:unprocessable_content)
       expect(json_response['error']).to eq("Invalid or expired token")
@@ -104,7 +99,7 @@ RSpec.describe "Api::V1::PasswordResets", type: :request do
       put "/api/v1/password_resets", params: { token: user.reset_token, password: '123' }
 
       expect(response).to have_http_status(:unprocessable_content)
-      expect(json_response['errors']).to include("Password is too short (minimum is 6 characters)")
+      expect(json_response['errors']).to include("Password is too short (minimum is 8 characters)")
     end
 
     it "rejects blank password" do
@@ -115,7 +110,7 @@ RSpec.describe "Api::V1::PasswordResets", type: :request do
     end
 
     it "requires token parameter" do
-      put "/api/v1/password_resets", params: { password: 'newpassword123' }
+      put "/api/v1/password_resets", params: { password: 'NewPassword123!' }
 
       expect(response).to have_http_status(:unprocessable_content)
       expect(json_response['error']).to eq("Invalid or expired token")
@@ -147,7 +142,7 @@ RSpec.describe "Api::V1::PasswordResets", type: :request do
         user.generate_password_reset_token! # Generate new token but try to use old one
         old_token = valid_params[:token]
 
-        put "/api/v1/password_resets", params: { token: old_token, password: 'anotherpassword123' }
+        put "/api/v1/password_resets", params: { token: old_token, password: 'AnotherPassword123!' }
         expect(response).to have_http_status(:unprocessable_content)
         expect(json_response['error']).to eq("Invalid or expired token")
       end

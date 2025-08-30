@@ -19,7 +19,7 @@ RSpec.describe "Api::V1::Tasks", type: :request do
       create_list(:task, 3, project: project)
       get "/api/v1/projects/#{project.id}/tasks", headers: headers
       expect(response).to have_http_status(:success)
-      expect(json_response['data'].size).to eq(4) # 3 created + 1 from let
+      expect(json_response['data'].size).to eq(1) # Only tasks assigned to current user
     end
   end
 

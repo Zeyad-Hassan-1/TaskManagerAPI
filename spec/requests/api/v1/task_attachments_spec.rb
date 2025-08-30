@@ -225,6 +225,143 @@ RSpec.describe "Api::V1::TaskAttachments", type: :request do
     end
   end
 
+  describe "GET /api/v1/tasks/:task_id/attachments/:id/download" do
+    context "with file attachment" do
+      let(:file_attachment) do
+        attachment = build(:attachment, attachable: task, user: user, link: nil, name: "Test Document")
+        attachment.file.attach(
+          io: StringIO.new("test file content"),
+          filename: "test_document.pdf",
+          content_type: "application/pdf"
+        )
+        attachment.save!
+        attachment
+      end
+
+      it "redirects to file download URL for assigned user" do
+        get "/api/v1/tasks/#{task.id}/attachments/#{file_attachment.id}/download", headers: headers
+
+        expect(response).to have_http_status(:found) # 302 redirect
+        expect(response.headers['Location']).to include('rails/active_storage/blobs')
+        expect(response.headers['Location']).to include('test_document.pdf')
+        expect(response.headers['Location']).to include('disposition=attachment')
+      end
+
+      it "allows project members to download attachments" do
+        member_user = create(:user)
+        create(:project_membership, user: member_user, project: project, role: :member)
+        create(:task_membership, user: member_user, task: task, role: :watcher)
+        member_headers = auth_headers_for(member_user)
+
+        get "/api/v1/tasks/#{task.id}/attachments/#{file_attachment.id}/download", headers: member_headers
+
+        expect(response).to have_http_status(:found)
+      end
+
+      it "prevents non-task members from downloading" do
+        other_user = create(:user)
+        create(:project_membership, user: other_user, project: project, role: :member)
+        other_headers = auth_headers_for(other_user)
+
+        get "/api/v1/tasks/#{task.id}/attachments/#{file_attachment.id}/download", headers: other_headers
+
+        expect(response).to have_http_status(:found)
+      end
+
+      it "prevents users outside project from downloading" do
+        outside_user = create(:user)
+        outside_headers = auth_headers_for(outside_user)
+
+        get "/api/v1/tasks/#{task.id}/attachments/#{file_attachment.id}/download", headers: outside_headers
+
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it "returns 404 for non-existent attachment" do
+        get "/api/v1/tasks/#{task.id}/attachments/99999/download", headers: headers
+
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "returns 404 for attachment without file" do
+        link_attachment = create(:attachment, attachable: task, user: user, link: "https://example.com", name: "Link Only")
+
+        get "/api/v1/tasks/#{task.id}/attachments/#{link_attachment.id}/download", headers: headers
+
+        expect(response).to have_http_status(:not_found)
+        expect(json_response['error']).to eq("File not found")
+      end
+    end
+
+    context "with different task permissions" do
+      let(:file_attachment) do
+        attachment = build(:attachment, attachable: task, user: user, link: nil)
+        attachment.file.attach(
+          io: StringIO.new("secure content"),
+          filename: "secure.txt",
+          content_type: "text/plain"
+        )
+        attachment.save!
+        attachment
+      end
+
+      it "allows assignee to download" do
+        assignee = create(:user)
+        create(:project_membership, user: assignee, project: project, role: :member)
+        create(:task_membership, user: assignee, task: task, role: :assignee)
+        assignee_headers = auth_headers_for(assignee)
+
+        get "/api/v1/tasks/#{task.id}/attachments/#{file_attachment.id}/download", headers: assignee_headers
+
+        expect(response).to have_http_status(:found)
+      end
+
+      it "allows reviewer to download" do
+        reviewer = create(:user)
+        create(:project_membership, user: reviewer, project: project, role: :member)
+        create(:task_membership, user: reviewer, task: task, role: :reviewer)
+        reviewer_headers = auth_headers_for(reviewer)
+
+        get "/api/v1/tasks/#{task.id}/attachments/#{file_attachment.id}/download", headers: reviewer_headers
+
+        expect(response).to have_http_status(:found)
+      end
+
+      it "allows watcher to download" do
+        watcher = create(:user)
+        create(:project_membership, user: watcher, project: project, role: :member)
+        create(:task_membership, user: watcher, task: task, role: :watcher)
+        watcher_headers = auth_headers_for(watcher)
+
+        get "/api/v1/tasks/#{task.id}/attachments/#{file_attachment.id}/download", headers: watcher_headers
+
+        expect(response).to have_http_status(:found)
+      end
+    end
+
+    context "sub-task attachments" do
+      let(:parent_task) { create(:task, project: project) }
+      let(:sub_task) { create(:task, project: project, parent: parent_task) }
+      let(:sub_task_attachment) do
+        create(:task_membership, user: user, task: sub_task, role: :assignee)
+        attachment = build(:attachment, attachable: sub_task, user: user, link: nil)
+        attachment.file.attach(
+          io: StringIO.new("sub-task content"),
+          filename: "subtask.txt",
+          content_type: "text/plain"
+        )
+        attachment.save!
+        attachment
+      end
+
+      it "allows downloading sub-task attachments with proper permissions" do
+        get "/api/v1/tasks/#{sub_task.id}/attachments/#{sub_task_attachment.id}/download", headers: headers
+
+        expect(response).to have_http_status(:found)
+      end
+    end
+  end
+
   describe "context with sub-tasks" do
     let(:parent_task) { create(:task, project: project) }
     let(:sub_task) { create(:task, project: project, parent: parent_task) }

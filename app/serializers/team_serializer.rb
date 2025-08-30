@@ -1,18 +1,13 @@
 class TeamSerializer < ActiveModel::Serializer
-  attributes :id, :name, :description, :created_at, :updated_at
+  attributes :id, :name, :description, :created_at, :updated_at, :members_count, :projects_count
 
-  has_many :team_memberships
+  has_many :team_memberships, serializer: TeamMembershipSerializer
 
-  def team_memberships
-    object.team_memberships.includes(:user).map do |membership|
-      {
-        id: membership.id,
-        user_id: membership.user_id,
-        username: membership.user.username,
-        email: membership.user.email,
-        role: membership.role,
-        created_at: membership.created_at
-      }
-    end
+  def members_count
+    object.users.count
+  end
+
+  def projects_count
+    object.projects.count
   end
 end

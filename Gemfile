@@ -3,6 +3,7 @@ gem "bcrypt", ">= 3.1.12"
 gem "jwt", ">= 2.5"
 gem "rack-cors", ">= 0"
 gem "active_model_serializers", ">= 0.10.12"
+gem "rswag"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 8.0.2", ">= 8.0.2.1"
@@ -57,7 +58,9 @@ gem "rack-attack", require: false
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
+  gem "rspec-rails"
   gem "rswag-specs"
+  gem "rspec-openapi"
   # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
   gem "brakeman", require: false
 
@@ -65,7 +68,6 @@ group :development, :test do
   gem "rubocop-rails-omakase", require: false
 
   # Testing gems
-  gem "rspec-rails", "~> 6.0"
   gem "factory_bot_rails", "~> 6.4"
   gem "faker", "~> 3.2"
   gem "shoulda-matchers", "~> 6.0"

@@ -136,18 +136,18 @@ RSpec.describe User, type: :model do
 
   describe 'secure password' do
     it 'encrypts the password' do
-      user = create(:user, password: 'secret123')
+      user = create(:user, password: 'Password123!')
       expect(user.password_digest).to be_present
-      expect(user.password_digest).not_to eq('secret123')
+      expect(user.password_digest).not_to eq('Password123!')
     end
 
     it 'authenticates with correct password' do
-      user = create(:user, password: 'secret123')
-      expect(user.authenticate('secret123')).to eq(user)
+      user = create(:user, password: 'Password123!')
+      expect(user.authenticate('Password123!')).to eq(user)
     end
 
     it 'does not authenticate with incorrect password' do
-      user = create(:user, password: 'secret123')
+      user = create(:user, password: 'Password123!')
       expect(user.authenticate('wrong_password')).to be false
     end
   end

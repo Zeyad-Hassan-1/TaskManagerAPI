@@ -51,17 +51,27 @@ class Api::V1::InvitationsController < Api::ApplicationController
   def add_user_to_membership
     if @invitation.invitable_type == "Team"
       team = @invitation.invitable
-      team_membership = team.team_memberships.create!(
-        user: @invitation.invitee,
-        role: @invitation.role
-      )
+      team_membership = team.team_memberships.find_or_create_by(user: @invitation.invitee) do |tm|
+        tm.role = @invitation.role
+      end
+
+      # Notify all team members about the new member
+      team.users.where.not(id: @invitation.invitee.id).each do |member|
+        create_notification(member, team, "member_joined")
+      end
+
       Rails.logger.info("User #{@invitation.invitee.username} added to team #{team.name} with role #{team_membership.role}")
     elsif @invitation.invitable_type == "Project"
       project = @invitation.invitable
-      project_membership = project.project_memberships.create!(
-        user: @invitation.invitee,
-        role: @invitation.role
-      )
+      project_membership = project.project_memberships.find_or_create_by(user: @invitation.invitee) do |pm|
+        pm.role = @invitation.role
+      end
+
+      # Notify all project members about the new member
+      project.users.where.not(id: @invitation.invitee.id).each do |member|
+        create_notification(member, project, "member_joined")
+      end
+
       Rails.logger.info("User #{@invitation.invitee.username} added to project #{project.name} with role #{project_membership.role}")
     else
       raise ArgumentError, "Unknown invitable type: #{@invitation.invitable_type}"

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_27_165337) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_29_165238) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -110,6 +110,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_27_165337) do
     t.bigint "team_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "status", default: 0, null: false
+    t.index ["status"], name: "index_projects_on_status"
     t.index ["team_id"], name: "index_projects_on_team_id"
   end
 
@@ -160,8 +162,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_27_165337) do
     t.integer "priority"
     t.datetime "due_date"
     t.bigint "parent_id"
+    t.integer "status", default: 0, null: false
     t.index ["parent_id"], name: "index_tasks_on_parent_id"
     t.index ["project_id"], name: "index_tasks_on_project_id"
+    t.index ["status"], name: "index_tasks_on_status"
   end
 
   create_table "team_memberships", force: :cascade do |t|

@@ -24,10 +24,10 @@ module Api
           # Validate password before attempting update
           if params[:password].blank?
             render json: { errors: [ "Password can't be blank" ] }, status: :unprocessable_content
-          elsif params[:password].length < 6
-            render json: { errors: [ "Password is too short (minimum is 6 characters)" ] }, status: :unprocessable_content
-          elsif user.update(password: params[:password], reset_token: nil)
-            render json: { message: "Password updated" }
+          elsif params[:password].length < 8
+            render json: { errors: [ "Password is too short (minimum is 8 characters)" ] }, status: :unprocessable_content
+          elsif user.update(password: params[:password], reset_token: nil, reset_sent_at: nil)
+            render json: { message: "Password updated successfully" }
           else
             render json: { errors: user.errors.full_messages }, status: :unprocessable_content
           end

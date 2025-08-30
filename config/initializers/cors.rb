@@ -9,9 +9,11 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
     # Allow CORS from configured origins
     origins do |origin|
-      # In development, allow localhost
+      # In development, allow localhost and ngrok
       if Rails.env.development?
-        origin =~ /\Ahttps?:\/\/localhost(:\d+)?\z/
+        origin =~ /\Ahttps?:\/\/localhost(:\d+)?\z/ ||
+        origin =~ /\Ahttps?:\/\/.*\.ngrok.*\.app\z/ ||
+        origin =~ /\Ahttps?:\/\/.*\.vercel\.app\z/
       else
         # In production, use environment variable or allow all
         cors_origins = ENV.fetch("CORS_ORIGINS", "*").split(",")

@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe "Api::V1::Users", type: :request do
   describe "POST /api/v1/signup" do
-    let(:valid_params) { { username: 'newuser', email: 'test@example.com', password: 'password123', bio: 'Test bio' } }
+    let(:valid_params) { { username: 'newuser', email: 'test@example.com', password: 'Password123!', bio: 'Test bio' } }
 
     it "creates a new user with valid parameters" do
       expect {
@@ -87,7 +87,7 @@ RSpec.describe "Api::V1::Users", type: :request do
       post "/api/v1/signup", params: valid_params.merge(password: '123')
 
       expect(response).to have_http_status(:unprocessable_content)
-      expect(json_response['errors']).to include("Password is too short (minimum is 6 characters)")
+      expect(json_response['errors']).to include("Password is too short (minimum is 8 characters)")
     end
 
     it "allows optional bio" do

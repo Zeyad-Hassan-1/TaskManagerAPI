@@ -10,9 +10,9 @@ RSpec.describe "Api::V1::Activities", type: :request do
     end
   end
 
-  describe "POST /api/v1/activities/mark_as_read" do
+  describe "PUT /api/v1/activities/mark_all_read" do
     it "returns http success" do
-      post "/api/v1/activities/mark_as_read", headers: auth_headers_for(user)
+      put "/api/v1/activities/mark_all_read", headers: auth_headers_for(user)
       expect(response).to have_http_status(:success)
     end
   end

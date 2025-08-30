@@ -12,7 +12,8 @@ class Task < ApplicationRecord
   has_many :sub_tasks, class_name: "Task", foreign_key: "parent_id", dependent: :destroy
 
   enum :priority, { low: 0, medium: 1, high: 2 }
+  enum :status, { todo: 0, doing: 1, done: 2 }
 
-  validates :name, presence: true
+  validates :name, presence: true, uniqueness: { scope: :project_id, message: "must be unique within the project" }
   validates :project_id, presence: true
 end

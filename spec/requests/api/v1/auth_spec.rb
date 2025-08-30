@@ -1,11 +1,12 @@
 require 'rails_helper'
+require 'swagger_helper'
 
 RSpec.describe "Api::V1::Auth", type: :request do
-  let(:user) { create(:user, username: 'testuser', password: 'password123') }
+  let(:user) { create(:user, username: 'testuser', password: 'Password123!') }
 
   describe "POST /api/v1/login" do
     it "authenticates user with valid credentials" do
-      post "/api/v1/login", params: { username: user.username, password: 'password123' }
+      post "/api/v1/login", params: { username: user.username, password: 'Password123!' }
 
       expect(response).to have_http_status(:ok)
       expect(json_response['data']['username']).to eq(user.username)
@@ -14,7 +15,7 @@ RSpec.describe "Api::V1::Auth", type: :request do
     end
 
     it "rejects invalid username" do
-      post "/api/v1/login", params: { username: 'wronguser', password: 'password123' }
+      post "/api/v1/login", params: { username: 'wronguser', password: 'Password123!' }
 
       expect(response).to have_http_status(:unauthorized)
       expect(json_response['message']).to eq("User doesn't exist")
@@ -29,7 +30,7 @@ RSpec.describe "Api::V1::Auth", type: :request do
 
     it "creates a refresh token in the database" do
       expect {
-        post "/api/v1/login", params: { username: user.username, password: 'password123' }
+        post "/api/v1/login", params: { username: user.username, password: 'Password123!' }
       }.to change(RefreshToken, :count).by(1)
 
       refresh_token = RefreshToken.last

@@ -10,6 +10,12 @@ module Authorizable
       membership.present?
     end
 
+    # Check if a specific user has at least member role in team
+    def member_of_team_for_user?(team, user)
+      membership = team.team_memberships.find_by(user: user)
+      membership.present?
+    end
+
     # Check if user has at least admin role in team
     def admin_of_team?(team)
       membership = team.team_memberships.find_by(user: current_user)
@@ -25,6 +31,12 @@ module Authorizable
     # Check if user has at least member role in project
     def member_of_project?(project)
       membership = project.project_memberships.find_by(user: current_user)
+      membership.present?
+    end
+
+    # Check if a specific user has at least member role in project
+    def member_of_project_for_user?(project, user)
+      membership = project.project_memberships.find_by(user: user)
       membership.present?
     end
 

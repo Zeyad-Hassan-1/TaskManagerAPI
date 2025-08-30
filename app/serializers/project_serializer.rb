@@ -1,24 +1,23 @@
 class ProjectSerializer < ActiveModel::Serializer
-  attributes :id, :name, :description, :created_at, :updated_at
+  attributes :id, :name, :description, :status, :created_at, :updated_at, :members_count, :tasks_count, :sub_tasks_count
 
   # Include team information
   belongs_to :team, serializer: TeamSerializer
 
   # Include project members with their roles
-  has_many :project_memberships
-  has_many :comments
-  has_many :tags
+  has_many :project_memberships, serializer: ProjectMembershipSerializer
+  has_many :comments, serializer: CommentSerializer
+  has_many :tags, serializer: TagSerializer
 
-  def project_memberships
-    object.project_memberships.includes(:user).map do |membership|
-      {
-        id: membership.id,
-        user_id: membership.user_id,
-        username: membership.user.username,
-        email: membership.user.email,
-        role: membership.role,
-        created_at: membership.created_at
-      }
-    end
+  def members_count
+    object.users.count
+  end
+
+  def tasks_count
+    object.tasks.where(parent_id: nil).count  # Only root tasks, not sub-tasks
+  end
+
+  def sub_tasks_count
+    object.tasks.where.not(parent_id: nil).count  # Only sub-tasks
   end
 end

@@ -4,14 +4,24 @@ module Api
       include Authorizable
       include Notifiable
 
-      before_action :set_project, only: [ :show, :update, :destroy, :invite_member, :remove_member, :promote_member, :demote_member ]
-      before_action :ensure_member_access, only: [ :show ]
-      before_action :ensure_admin_access, only: [ :update, :invite_member ]
+      before_action :set_project, only: [ :show, :update, :destroy, :invite_member, :remove_member, :promote_member, :demote_member, :add_comment, :remove_comment, :add_tag, :remove_tag, :add_attachment, :remove_attachment ]
+      before_action :ensure_member_access, only: [ :show, :add_comment, :add_tag, :add_attachment ]
+      before_action :ensure_admin_access, only: [ :update, :invite_member, :remove_comment, :remove_tag, :remove_attachment ]
       before_action :ensure_owner_access, only: [ :destroy, :remove_member, :promote_member, :demote_member ]
 
       # GET /api/v1/teams/:team_id/projects
       def index
-        @team = current_user.teams.find(params[:team_id])
+        begin
+          @team = Team.find(params[:team_id])
+        rescue ActiveRecord::RecordNotFound
+          return render_error("Team not found", :not_found)
+        end
+
+        # Check if user is a member of the team
+        unless member_of_team?(@team)
+          return render_unauthorized("You must be a member of this team to view its projects")
+        end
+
         @projects = @team.projects
 
         serialized_projects = @projects.map do |project|
@@ -29,7 +39,11 @@ module Api
 
       # POST /api/v1/teams/:team_id/projects
       def create
-        @team = current_user.teams.find(params[:team_id])
+        begin
+          @team = Team.find(params[:team_id])
+        rescue ActiveRecord::RecordNotFound
+          return render_error("Team not found", :not_found)
+        end
 
         # Only admins and owners can create projects
         unless admin_of_team?(@team)
@@ -70,6 +84,11 @@ module Api
 
         unless invitee
           return render_error("User not found", :not_found)
+        end
+
+        # Check if user is a member of the team that owns this project
+        unless @project.team.team_memberships.exists?(user: invitee)
+          return render_error("User must be a member of the team to be invited to projects")
         end
 
         if @project.project_memberships.exists?(user: invitee)
@@ -151,17 +170,90 @@ module Api
         render_success({ message: "Admin demoted to member successfully" })
       end
 
+      # POST /api/v1/projects/:id/comments
+      def add_comment
+        comment = @project.comments.build(comment_params)
+        comment.user = current_user
+
+        if comment.save
+          serialized_comment = CommentSerializer.new(comment).serializable_hash
+          render json: { data: serialized_comment }, status: :created
+        else
+          render_error(comment.errors.full_messages.join(", "))
+        end
+      end
+
+      # DELETE /api/v1/projects/:id/comments/:comment_id
+      def remove_comment
+        comment = @project.comments.find(params[:comment_id])
+
+        # Only allow user to delete their own comments or admin/owner can delete any
+        unless comment.user == current_user || admin_of_project?(@project)
+          return render_unauthorized("You can only delete your own comments")
+        end
+
+        comment.destroy
+        render_success({ message: "Comment deleted successfully" })
+      end
+
+      # POST /api/v1/projects/:id/tags
+      def add_tag
+        tag = Tag.find_or_create_by(name: params[:name].strip.downcase)
+
+        unless @project.tags.include?(tag)
+          @project.tags << tag
+          serialized_tag = TagSerializer.new(tag).serializable_hash
+          render json: { data: serialized_tag }, status: :created
+        else
+          render_error("Tag already exists on this project")
+        end
+      end
+
+      # DELETE /api/v1/projects/:id/tags/:tag_id
+      def remove_tag
+        tag = @project.tags.find(params[:tag_id])
+        @project.tags.delete(tag)
+        render_success({ message: "Tag removed successfully" })
+      end
+
+      # POST /api/v1/projects/:id/attachments
+      def add_attachment
+        attachment = @project.attachments.build(attachment_params)
+        attachment.user = current_user
+
+        if attachment.save
+          serialized_attachment = AttachmentSerializer.new(attachment).serializable_hash
+          render json: { data: serialized_attachment }, status: :created
+        else
+          render_error(attachment.errors.full_messages.join(", "))
+        end
+      end
+
+      # DELETE /api/v1/projects/:id/attachments/:attachment_id
+      def remove_attachment
+        attachment = @project.attachments.find(params[:attachment_id])
+
+        # Only allow user to delete their own attachments or admin/owner can delete any
+        unless attachment.user == current_user || admin_of_project?(@project)
+          return render_unauthorized("You can only delete your own attachments")
+        end
+
+        attachment.destroy
+        render_success({ message: "Attachment deleted successfully" })
+      end
+
       private
 
       def set_project
-        @project = current_user.projects.find(params[:id])
+        @project = Project.find(params[:id])
       rescue ActiveRecord::RecordNotFound
         render_error("Project not found", :not_found)
       end
 
       def ensure_member_access
-        unless member_of_project?(@project)
-          render_unauthorized("You must be a member of this project to view it")
+        # Allow access if user is either a project member OR a team member
+        unless member_of_project?(@project) || member_of_team?(@project.team)
+          render_unauthorized("You must be a member of this project or its team to view it")
         end
       end
 
@@ -178,7 +270,15 @@ module Api
       end
 
       def project_params
-        params.require(:project).permit(:name, :description)
+        params.require(:project).permit(:name, :description, :status)
+      end
+
+      def comment_params
+        params.require(:comment).permit(:content)
+      end
+
+      def attachment_params
+        params.require(:attachment).permit(:file, :description)
       end
     end
   end

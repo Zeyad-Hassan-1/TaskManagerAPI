@@ -9,6 +9,8 @@ class Project < ApplicationRecord
   has_many :attachments, as: :attachable
   has_many :invitations, as: :invitable, dependent: :destroy
 
-  validates :name, presence: true
+  enum :status, { active: 0, completed: 1, archived: 2 }
+
+  validates :name, presence: true, uniqueness: { scope: :team_id, message: "must be unique within the team" }
   validates :description, presence: true
 end
