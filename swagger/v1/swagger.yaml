@@ -21,29 +21,24 @@ paths:
             schema:
               type: object
               properties:
-                user:
-                  type: object
-                  properties:
-                    username:
-                      type: string
-                      example: "johndoe"
-                    email:
-                      type: string
-                      format: email
-                      example: "john@example.com"
-                    password:
-                      type: string
-                      format: password
-                      example: "Password123!"
-                    password_confirmation:
-                      type: string
-                      format: password
-                      example: "Password123!"
-                  required:
-                    - username
-                    - email
-                    - password
-                    - password_confirmation
+                username:
+                  type: string
+                  example: "johndoe"
+                email:
+                  type: string
+                  format: email
+                  example: "john@example.com"
+                password:
+                  type: string
+                  format: password
+                  example: "Password123!"
+                bio:
+                  type: string
+                  example: "A passionate developer"
+              required:
+                - username
+                - email
+                - password
       responses:
         '201':
           description: User created successfully
@@ -94,10 +89,9 @@ paths:
             schema:
               type: object
               properties:
-                email:
+                username:
                   type: string
-                  format: email
-                  example: "john@example.com"
+                  example: "johndoe"
                 password:
                   type: string
                   format: password
@@ -142,6 +136,33 @@ paths:
                   message:
                     type: string
 
+  /api/v1/refresh:
+    post:
+      summary: Refresh Access Token
+      tags:
+        - Authentication
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+        '401':
+          description: Invalid refresh token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
   /api/v1/logout:
     post:
       summary: User Logout
@@ -163,6 +184,156 @@ paths:
                     type: string
         '401':
           description: Unauthorized
+
+  /api/v1/me:
+    get:
+      summary: Get Current User
+      tags:
+        - Users
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: User details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      username:
+                        type: string
+                      email:
+                        type: string
+        '401':
+          description: Unauthorized
+
+  /api/v1/profile:
+    put:
+      summary: Update User Profile
+      tags:
+        - Users
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    username:
+                      type: string
+                    email:
+                      type: string
+                    bio:
+                      type: string
+      responses:
+        '200':
+          description: Profile updated successfully
+        '422':
+          description: Validation errors
+
+  /api/v1/change_password:
+    put:
+      summary: Change User Password
+      tags:
+        - Users
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                current_password:
+                  type: string
+                  format: password
+                new_password:
+                  type: string
+                  format: password
+                new_password_confirmation:
+                  type: string
+                  format: password
+      responses:
+        '200':
+          description: Password updated successfully
+        '422':
+          description: Validation errors
+
+  /api/v1/profile/picture:
+    post:
+      summary: Upload Profile Picture
+      tags:
+        - Users
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                profile_picture:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Profile picture updated successfully
+        '422':
+          description: Validation errors
+
+  /api/v1/password_resets:
+    post:
+      summary: Request Password Reset
+      tags:
+        - Password Resets
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        '200':
+          description: Reset instructions sent
+        '404':
+          description: Email not found
+    put:
+      summary: Reset Password
+      tags:
+        - Password Resets
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                password:
+                  type: string
+                  format: password
+      responses:
+        '200':
+          description: Password updated successfully
+        '422':
+          description: Invalid token or password
 
   /api/v1/teams:
     get:
@@ -334,7 +505,7 @@ paths:
         '404':
           description: Team not found
 
-  /api/v1/teams/{team_id}/invite:
+  /api/v1/teams/{id}/invite_member:
     post:
       summary: Invite user to team
       tags:
@@ -342,7 +513,7 @@ paths:
       security:
         - BearerAuth: []
       parameters:
-        - name: team_id
+        - name: id
           in: path
           required: true
           schema:
@@ -354,22 +525,84 @@ paths:
             schema:
               type: object
               properties:
-                invitation:
-                  type: object
-                  properties:
-                    email:
-                      type: string
-                      format: email
-                    role:
-                      type: string
-                      enum: [admin, member]
-                  required:
-                    - email
+                username:
+                  type: string
+                role:
+                  type: string
+                  enum: [admin, member]
+              required:
+                - username
       responses:
         '201':
           description: Invitation sent successfully
         '422':
           description: Validation errors
+
+  /api/v1/teams/{id}/members/{user_id}/promote:
+    put:
+      summary: Promote team member to admin
+      tags:
+        - Teams
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Member promoted to admin successfully
+
+  /api/v1/teams/{id}/members/{user_id}/demote:
+    put:
+      summary: Demote team admin to member
+      tags:
+        - Teams
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Admin demoted to member successfully
+
+  /api/v1/teams/{id}/members/{user_id}:
+    delete:
+      summary: Remove member from team
+      tags:
+        - Teams
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Member removed successfully
 
   /api/v1/teams/{team_id}/projects:
     get:
@@ -421,15 +654,30 @@ paths:
         '422':
           description: Validation errors
 
-  /api/v1/projects/{project_id}/members:
-    post:
-      summary: Add member to project
+  /api/v1/projects/{id}:
+    get:
+      summary: Get project details
       tags:
         - Projects
       security:
         - BearerAuth: []
       parameters:
-        - name: project_id
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Project details
+    put:
+      summary: Update project
+      tags:
+        - Projects
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
           in: path
           required: true
           schema:
@@ -441,8 +689,56 @@ paths:
             schema:
               type: object
               properties:
-                user_id:
-                  type: integer
+                project:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    description:
+                      type: string
+      responses:
+        '200':
+          description: Project updated successfully
+        '422':
+          description: Validation errors
+    delete:
+      summary: Delete project
+      tags:
+        - Projects
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Project deleted successfully
+
+  /api/v1/projects/{id}/invite_member:
+    post:
+      summary: Add member to project
+      tags:
+        - Projects
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
                 role:
                   type: string
                   enum: [admin, member]
@@ -451,6 +747,72 @@ paths:
           description: Member added successfully
         '422':
           description: Validation errors
+
+  /api/v1/projects/{id}/members/{user_id}/promote:
+    put:
+      summary: Promote project member to admin
+      tags:
+        - Projects
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Member promoted to admin successfully
+
+  /api/v1/projects/{id}/members/{user_id}/demote:
+    put:
+      summary: Demote project admin to member
+      tags:
+        - Projects
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Admin demoted to member successfully
+
+  /api/v1/projects/{id}/members/{user_id}:
+    delete:
+      summary: Remove member from project
+      tags:
+        - Projects
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Member removed successfully
 
   /api/v1/projects/{project_id}/tasks:
     get:
@@ -508,6 +870,128 @@ paths:
         '422':
           description: Validation errors
 
+  /api/v1/tasks/{id}:
+    get:
+      summary: Get task details
+      tags:
+        - Tasks
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Task details
+    put:
+      summary: Update task
+      tags:
+        - Tasks
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                task:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    description:
+                      type: string
+                    priority:
+                      type: string
+                      enum: [low, medium, high, urgent]
+                    due_date:
+                      type: string
+                      format: date
+      responses:
+        '200':
+          description: Task updated successfully
+        '422':
+          description: Validation errors
+    delete:
+      summary: Delete task
+      tags:
+        - Tasks
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Task deleted successfully
+
+  /api/v1/tasks/{id}/assign_member:
+    post:
+      summary: Assign member to task
+      tags:
+        - Tasks
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                role:
+                  type: string
+                  enum: [assignee, reviewer, watcher]
+      responses:
+        '201':
+          description: User assigned to task successfully
+        '422':
+          description: Validation errors
+
+  /api/v1/tasks/{id}/members/{user_id}:
+    delete:
+      summary: Remove member from task
+      tags:
+        - Tasks
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User removed from task successfully
+
   /api/v1/tasks/{task_id}/sub_tasks:
     get:
       summary: List sub-tasks
@@ -564,6 +1048,128 @@ paths:
         '422':
           description: Validation errors
 
+  /api/v1/sub_tasks/{id}:
+    get:
+      summary: Get sub-task details
+      tags:
+        - Sub Tasks
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Sub-task details
+    put:
+      summary: Update sub-task
+      tags:
+        - Sub Tasks
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                task:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    description:
+                      type: string
+                    priority:
+                      type: string
+                      enum: [low, medium, high, urgent]
+                    due_date:
+                      type: string
+                      format: date
+      responses:
+        '200':
+          description: Sub-task updated successfully
+        '422':
+          description: Validation errors
+    delete:
+      summary: Delete sub-task
+      tags:
+        - Sub Tasks
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Sub-task deleted successfully
+
+  /api/v1/sub_tasks/{id}/assign_member:
+    post:
+      summary: Assign member to sub-task
+      tags:
+        - Sub Tasks
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                role:
+                  type: string
+                  enum: [assignee, reviewer, watcher]
+      responses:
+        '201':
+          description: User assigned to sub-task successfully
+        '422':
+          description: Validation errors
+
+  /api/v1/sub_tasks/{id}/members/{user_id}:
+    delete:
+      summary: Remove member from sub-task
+      tags:
+        - Sub Tasks
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User removed from sub-task successfully
+
   /api/v1/projects/{project_id}/add_comment:
     post:
       summary: Add comment to project
@@ -597,7 +1203,31 @@ paths:
         '422':
           description: Validation errors
 
-  /api/v1/tasks/{task_id}/add_comment:
+  /api/v1/projects/{project_id}/comments/{comment_id}:
+    delete:
+      summary: Remove comment from project
+      tags:
+        - Comments
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: comment_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Comment removed successfully
+        '404':
+          description: Comment not found
+
+  /api/v1/tasks/{task_id}/comments:
     post:
       summary: Add comment to task
       tags:
@@ -630,6 +1260,69 @@ paths:
         '422':
           description: Validation errors
 
+  /api/v1/tasks/{task_id}/comments/{id}:
+    put:
+      summary: Update task comment
+      tags:
+        - Comments
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                comment:
+                  type: object
+                  properties:
+                    content:
+                      type: string
+                  required:
+                    - content
+      responses:
+        '200':
+          description: Comment updated successfully
+        '422':
+          description: Validation errors
+        '404':
+          description: Comment not found
+
+    delete:
+      summary: Remove comment from task
+      tags:
+        - Comments
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Comment removed successfully
+        '404':
+          description: Comment not found
+
   /api/v1/projects/{project_id}/add_attachment:
     post:
       summary: Add attachment to project
@@ -650,21 +1343,50 @@ paths:
             schema:
               type: object
               properties:
-                attachment:
-                  type: object
-                  properties:
-                    file:
-                      type: string
-                      format: binary
-                    name:
-                      type: string
+                file:
+                  type: string
+                  format: binary
+                link:
+                  type: string
+                  format: uri
+                  description: URL link (alternative to file upload)
+                name:
+                  type: string
+                  description: Name for the attachment
+              oneOf:
+                - required: [file]
+                - required: [link]
       responses:
         '201':
           description: Attachment added successfully
         '422':
           description: Validation errors
 
-  /api/v1/tasks/{task_id}/add_attachment:
+  /api/v1/projects/{project_id}/attachments/{attachment_id}:
+    delete:
+      summary: Remove attachment from project
+      tags:
+        - Attachments
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: attachment_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Attachment removed successfully
+        '404':
+          description: Attachment not found
+
+  /api/v1/tasks/{task_id}/attachments:
     post:
       summary: Add attachment to task
       tags:
@@ -684,19 +1406,77 @@ paths:
             schema:
               type: object
               properties:
-                attachment:
-                  type: object
-                  properties:
-                    file:
-                      type: string
-                      format: binary
-                    name:
-                      type: string
+                file:
+                  type: string
+                  format: binary
+                link:
+                  type: string
+                  format: uri
+                  description: URL link (alternative to file upload)
+                name:
+                  type: string
+                  description: Name for the attachment
+              oneOf:
+                - required: [file]
+                - required: [link]
       responses:
         '201':
           description: Attachment added successfully
         '422':
           description: Validation errors
+
+  /api/v1/tasks/{task_id}/attachments/{id}:
+    delete:
+      summary: Remove attachment from task
+      tags:
+        - Attachments
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Attachment removed successfully
+        '404':
+          description: Attachment not found
+
+  /api/v1/tasks/{task_id}/attachments/{id}/download:
+    get:
+      summary: Download task attachment
+      tags:
+        - Attachments
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: File download
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Attachment not found
 
   /api/v1/projects/{project_id}/add_tag:
     post:
@@ -726,7 +1506,31 @@ paths:
         '422':
           description: Validation errors
 
-  /api/v1/tasks/{task_id}/add_tag:
+  /api/v1/projects/{project_id}/tags/{tag_id}:
+    delete:
+      summary: Remove tag from project
+      tags:
+        - Tags
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: tag_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Tag removed successfully
+        '404':
+          description: Tag not found
+
+  /api/v1/tasks/{task_id}/tags:
     post:
       summary: Add tag to task
       tags:
@@ -754,6 +1558,30 @@ paths:
         '422':
           description: Validation errors
 
+  /api/v1/tasks/{task_id}/tags/{id}:
+    delete:
+      summary: Remove tag from task
+      tags:
+        - Tags
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Tag removed successfully
+        '404':
+          description: Tag not found
+
   /api/v1/activities:
     get:
       summary: List user activities
@@ -764,6 +1592,103 @@ paths:
       responses:
         '200':
           description: Activities list
+
+  /api/v1/activities/{id}/read:
+    put:
+      summary: Mark activity as read
+      tags:
+        - Activities
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Activity marked as read
+
+  /api/v1/activities/mark_all_read:
+    put:
+      summary: Mark all activities as read
+      tags:
+        - Activities
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: All activities marked as read
+
+  /up:
+    get:
+      summary: Health check endpoint
+      tags:
+        - System
+      responses:
+        '200':
+          description: Application is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "ok"
+
+  /api/v1/invitations:
+    get:
+      summary: List user invitations
+      tags:
+        - Invitations
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Invitations list
+  /api/v1/invitations/{id}:
+    put:
+      summary: Update invitation status
+      tags:
+        - Invitations
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [accepted, declined]
+      responses:
+        '200':
+          description: Invitation updated successfully
+    delete:
+      summary: Decline invitation
+      tags:
+        - Invitations
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Invitation declined
 
 components:
   securitySchemes:

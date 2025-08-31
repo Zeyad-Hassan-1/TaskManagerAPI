@@ -278,7 +278,7 @@ module Api
       end
 
       def attachment_params
-        params.require(:attachment).permit(:file, :description)
+        params.permit(:file, :link, :name)
       end
     end
   end
