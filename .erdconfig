@@ -1,0 +1,15 @@
+# .erdconfig
+attributes:
+  - foreign_keys
+  - content
+disconnected: false
+inheritance: true
+notation: simple
+orientation: horizontal
+polymorphism: true
+sort: true
+warn: true
+filename: erd
+filetype: pdf
+indirect: false
+title: 'Task Manager API - Entity Relationship Diagram'
