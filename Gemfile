@@ -40,7 +40,7 @@ gem "thruster", require: false
 gem "image_processing", "~> 1.2"
 
 # Cloud Storage Support (install only what you need)
-gem "aws-sdk-s3", "~> 1.0", require: false  # For Amazon S3
+gem "aws-sdk-s3", "~> 1.201", require: false  # For Amazon S3
 # gem "google-cloud-storage", "~> 1.0", require: false  # For Google Cloud Storage
 # gem "azure-storage-blob", "~> 2.0", require: false  # For Azure Storage
 
